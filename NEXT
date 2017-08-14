@@ -1,0 +1,7 @@
+htmlx/find:
+	+ monad-style Finder
+	+ tests for nil guards
+	+ FindSibling (non-recursive)
+	- FindInSiblings (recursive)
+	- FindByAttrMatch for proper class searching
+	- why it got slower
