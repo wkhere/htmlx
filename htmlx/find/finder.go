@@ -6,7 +6,7 @@ import (
 )
 
 type Finder struct {
-	Node *html.Node
+	*html.Node
 }
 
 func NewFinder(h *html.Node) Finder {
