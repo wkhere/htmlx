@@ -31,7 +31,7 @@ func (f Finder) NextSibling() Finder {
 	return Finder{f.Node.NextSibling}
 }
 
-type WalkPredicate func(*html.Node) bool
+type FoundPredicate func(*html.Node) bool
 type walkerFunc func(*html.Node) bool
 
 // Find is universal finder.
@@ -41,7 +41,7 @@ type walkerFunc func(*html.Node) bool
 // (Measurements done on `metal` machine, perf mode.)
 // Btw measures above are obsolete, they predate use
 // of Finder struct and methods.
-func (f Finder) Find(pred WalkPredicate) (r Finder) {
+func (f Finder) Find(pred FoundPredicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
@@ -66,7 +66,7 @@ func (f Finder) Find(pred WalkPredicate) (r Finder) {
 
 // FindSibling performs flat find among node's siblings.
 // No recursion. Omits current node, starts from a first sibling.
-func (f Finder) FindSibling(pred WalkPredicate) (r Finder) {
+func (f Finder) FindSibling(pred FoundPredicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
@@ -79,13 +79,13 @@ func (f Finder) FindSibling(pred WalkPredicate) (r Finder) {
 	return
 }
 
-func elementP(element atom.Atom) WalkPredicate {
+func elementP(element atom.Atom) FoundPredicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && h.DataAtom == element
 	}
 }
 
-func attrP(attr, val string) WalkPredicate {
+func attrP(attr, val string) FoundPredicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && HasAttrVal(h.Attr, attr, val)
 	}
