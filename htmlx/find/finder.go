@@ -32,7 +32,6 @@ func (f Finder) NextSibling() Finder {
 }
 
 type FoundPredicate func(*html.Node) bool
-type walkerFunc func(*html.Node) bool
 
 // Find is universal finder.
 // Includes current node in search.
@@ -45,7 +44,7 @@ func (f Finder) Find(pred FoundPredicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
-	var walker walkerFunc
+	var walker func(node *html.Node) bool
 
 	walker = func(node *html.Node) bool {
 		if pred(node) {
