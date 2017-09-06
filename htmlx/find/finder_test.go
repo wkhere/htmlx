@@ -84,7 +84,7 @@ func TestFind(t *testing.T) {
 
 // todo: discover why it got slower.
 // maybe (f Finder) -> (f *Finder) ?
-func BenchmarkHFind(b *testing.B) {
+func BenchmarkFind(b *testing.B) {
 	f := s2f(`
 		<div>
 			<div id="id1">
