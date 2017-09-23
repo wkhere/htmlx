@@ -1,6 +1,7 @@
 package find
 
 import (
+	"bytes"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -9,12 +10,26 @@ type Finder struct {
 	*html.Node
 }
 
-func NewFinder(h *html.Node) Finder {
+func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
+}
+
+func FinderFromString(s string) (f Finder, err error) {
+	h, err := html.Parse(bytes.NewBufferString(s))
+	return Finder{h}, err
 }
 
 func (f Finder) IsEmpty() bool {
 	return f.Node == nil
+}
+
+func (f Finder) String() string {
+	if f.Node == nil {
+		return ""
+	}
+	var b bytes.Buffer
+	html.Render(&b, f.Node)
+	return b.String()
 }
 
 func (f Finder) FirstChild() Finder {
