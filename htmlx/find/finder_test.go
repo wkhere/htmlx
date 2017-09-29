@@ -32,10 +32,10 @@ func TestFind(t *testing.T) {
 		<div>
 			<div id="id1">
 				<span class="foo">1st</span>
-				<span id="id2" class="bar">2nd</span>
-				<span class="bar">3rd</span>
+				<span id="id2" class="bar other" attr2="boom">2nd</span>
+				<span class="bar another">3rd</span>
 				<div>
-					<span class="xyz">inner</span>
+					<span class="xyz yet-another">inner</span>
 				</div>
 			</div>
 		</div>
@@ -49,7 +49,8 @@ func TestFind(t *testing.T) {
 		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", res, s)
 	}
 
-	span2 := id1.FindByAttr("class", "bar")
+	span2 := id1.FindByClass("bar")
+
 	span2content := span2.FirstChild()
 	s = "2nd"
 	if res := span2content.String(); res != s {
@@ -60,7 +61,7 @@ func TestFind(t *testing.T) {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
-	if res := span1.FindSiblingByAttr("class", "bar"); res != span2 {
+	if res := span1.FindSiblingByClass("bar"); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`",
 			res.String(), span2.String())
 	}
@@ -69,25 +70,31 @@ func TestFind(t *testing.T) {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
+	if res := id1.FindByAttr("attr2", "boom"); res != span2 {
+		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
+	}
+
+	if res := span1.FindSiblingByAttr("attr2", "boom"); res != span2 {
+		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
+	}
+
 	span3 := span2.FindSiblingElement(atom.Span)
-	if res := span2.FindSiblingByAttr("class", "bar"); res != span3 {
+	if res := span2.FindSiblingByClass("bar"); res != span3 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span3)
 	}
 
-	if bad := top.FindById("bad"); !bad.IsEmpty() {
-		t.Errorf("mismatch:\ngot `%v`\nexp empty find", bad)
+	badFinds := []Finder{
+		top.FindById("bad"),
+		id1.FindByClass("bad"),
+		id1.NextSibling().FindSiblingById("any"),
+		id1.FirstChild().FindSiblingById("bad"),
+		span1.FindSiblingByClass("xyz"),
 	}
-	if bad := id1.FindByAttr("class", "bad"); !bad.IsEmpty() {
-		t.Errorf("mismatch:\ngot `%v`\nexp empty find", bad)
-	}
-	if bad := id1.NextSibling().FindSiblingById("any"); !bad.IsEmpty() {
-		t.Errorf("mismatch:\ngot `%v`\nexp empty find", bad)
-	}
-	if bad := id1.FirstChild().FindSiblingById("bad"); !bad.IsEmpty() {
-		t.Errorf("mismatch:\ngot `%v`\nexp empty find", bad)
-	}
-	if bad := span1.FindSiblingByAttr("class", "xyz"); !bad.IsEmpty() {
-		t.Errorf("mismatch:\ngot `%s`\nexp empty find", bad)
+
+	for i, bad := range badFinds {
+		if !bad.IsEmpty() {
+			t.Errorf("mismatch in tc[%d]:\ngot `%v`\nexp empty find", i, bad)
+		}
 	}
 }
 

@@ -3,5 +3,5 @@ htmlx/find:
 	+ tests for nil guards
 	+ FindSibling (non-recursive)
 	- FindInSiblings (recursive)
-	- FindByAttrMatch for proper class searching
+	+ FindByClass
 	- why it got slower

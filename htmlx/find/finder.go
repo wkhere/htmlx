@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"strings"
 )
 
 type Finder struct {
@@ -105,6 +106,12 @@ func attrP(attr, val string) Predicate {
 	}
 }
 
+func attrWordP(attr, word string) Predicate {
+	return func(h *html.Node) bool {
+		return h.Type == html.ElementNode && HasAttrWord(h.Attr, attr, word)
+	}
+}
+
 func (f Finder) FindElement(element atom.Atom) Finder {
 	return f.Find(elementP(element))
 }
@@ -125,8 +132,16 @@ func (f Finder) FindById(id string) Finder {
 	return f.Find(attrP("id", id))
 }
 
+func (f Finder) FindByClass(class string) Finder {
+	return f.Find(attrWordP("class", class))
+}
+
 func (f Finder) FindSiblingById(id string) Finder {
 	return f.FindSibling(attrP("id", id))
+}
+
+func (f Finder) FindSiblingByClass(class string) Finder {
+	return f.FindSibling(attrWordP("class", class))
 }
 
 func AttrVal(attr []html.Attribute, key string) (val string, ok bool) {
@@ -144,4 +159,17 @@ func HasAttrVal(attr []html.Attribute, key, val string) bool {
 		return false
 	}
 	return val == foundVal
+}
+
+func HasAttrWord(attr []html.Attribute, key, word string) bool {
+	foundVal, ok := AttrVal(attr, key)
+	if !ok {
+		return false
+	}
+	for _, w := range strings.Fields(foundVal) {
+		if w == word {
+			return true
+		}
+	}
+	return false
 }
