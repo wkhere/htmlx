@@ -1,4 +1,4 @@
-htmlx/find:
+Finder family:
 	+ monad-style Finder
 	+ tests for nil guards
 	+ FindSibling (non-recursive)

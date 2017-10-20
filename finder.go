@@ -1,4 +1,4 @@
-package find
+package htmlx
 
 import (
 	"bytes"
@@ -47,7 +47,7 @@ func (f Finder) NextSibling() Finder {
 	return Finder{f.Node.NextSibling}
 }
 
-type Predicate func(*html.Node) bool
+type FinderPredicate func(*html.Node) bool
 
 // Find is universal finder.
 // Includes current node in search.
@@ -56,7 +56,7 @@ type Predicate func(*html.Node) bool
 // (Measurements done on `metal` machine, perf mode.)
 // Btw measures above are obsolete, they predate use
 // of Finder struct and methods.
-func (f Finder) Find(pred Predicate) (r Finder) {
+func (f Finder) Find(pred FinderPredicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
@@ -81,7 +81,7 @@ func (f Finder) Find(pred Predicate) (r Finder) {
 
 // FindSibling performs flat find among node's siblings.
 // No recursion. Omits current node, starts from a first sibling.
-func (f Finder) FindSibling(pred Predicate) (r Finder) {
+func (f Finder) FindSibling(pred FinderPredicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
@@ -94,19 +94,19 @@ func (f Finder) FindSibling(pred Predicate) (r Finder) {
 	return
 }
 
-func elementP(element atom.Atom) Predicate {
+func elementP(element atom.Atom) FinderPredicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && h.DataAtom == element
 	}
 }
 
-func attrP(attr, val string) Predicate {
+func attrP(attr, val string) FinderPredicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && HasAttrVal(h.Attr, attr, val)
 	}
 }
 
-func attrWordP(attr, word string) Predicate {
+func attrWordP(attr, word string) FinderPredicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && HasAttrWord(h.Attr, attr, word)
 	}

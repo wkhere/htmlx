@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/wkhere/x/htmlx/debug"
+	"github.com/wkhere/htmlx/debug"
 	"golang.org/x/net/html"
 )
 
