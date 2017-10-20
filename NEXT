@@ -5,3 +5,6 @@ htmlx/find:
 	- FindInSiblings (recursive)
 	+ FindByClass
 	- why it got slower
+
+parsehtml binary:
+	- parse also local files
