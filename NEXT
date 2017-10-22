@@ -9,3 +9,4 @@ Finder family:
 
 parsehtml binary:
 	+ parse also local files
+	- show whitespace-only lines in a compact way
