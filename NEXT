@@ -8,4 +8,4 @@ Finder family:
 	- concurrency?
 
 parsehtml binary:
-	- parse also local files
+	+ parse also local files

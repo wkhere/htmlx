@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strings"
@@ -11,13 +12,17 @@ import (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s url\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s url-or-file\n", os.Args[0])
+}
+
+func die(err error) {
+	fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+	os.Exit(1)
 }
 
 func dieIf(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
-		os.Exit(1)
+		die(err)
 	}
 }
 
@@ -27,17 +32,33 @@ func main() {
 		os.Exit(2)
 	}
 	url := os.Args[1]
-	if !strings.HasPrefix(url, "http") {
-		url = "http://" + url
+	if !strings.Contains(url, "://") {
+		url = "file://" + url
 	}
 
+	var r io.ReadCloser
 	var err error
 
-	resp, err := http.Get(url)
-	dieIf(err)
-	defer resp.Body.Close()
+	switch tokens := strings.Split(url, "://"); tokens[0] {
+	case "file":
+		if tokens[1] == "-" {
+			r = os.Stdin
+			break
+		}
+		r, err = os.Open(tokens[1])
+		dieIf(err)
 
-	root, err := html.Parse(resp.Body)
+	case "http", "https":
+		resp, err := http.Get(url)
+		dieIf(err)
+		r = resp.Body
+
+	default:
+		die(fmt.Errorf("unknown proto: %s", tokens[0]))
+	}
+	defer r.Close()
+
+	root, err := html.Parse(r)
 	dieIf(err)
 
 	debug.PrintHTML(root)
