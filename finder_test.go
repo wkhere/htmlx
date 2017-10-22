@@ -2,8 +2,10 @@ package htmlx
 
 import (
 	"os"
+	"path"
 	"testing"
 
+	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
@@ -25,6 +27,19 @@ func TestEmpty(t *testing.T) {
 	if empty.NextSibling() != empty {
 		t.Errorf("expected empty.NextSibling to return also empty finder")
 	}
+	if empty.String() != "" {
+		t.Errorf("expected empty.String to return empty string")
+	}
+}
+
+func TestFromNode(t *testing.T) {
+	node, _ := html.Parse(testdata("simple.html"))
+	top := FinderFromNode(node)
+	div0 := top.FindElement(atom.Div)
+
+	if div0.FindByClass("bar") != div0.FindByClass("other") {
+		t.Errorf("mismatch")
+	}
 }
 
 func TestFromString(t *testing.T) {
@@ -39,12 +54,8 @@ func TestFromString(t *testing.T) {
 
 func TestFind(t *testing.T) {
 	var s string
-	r, err := os.Open("testdata/simple.html")
-	if err != nil {
-		panic(err)
-	}
 
-	top, _ := FinderFromReader(r)
+	top, _ := FinderFromReader(testdata("simple.html"))
 
 	id1 := top.FindById("id1")
 
@@ -123,4 +134,12 @@ func BenchmarkFind(b *testing.B) {
 		id1 := f.FindById("id1")
 		id1.FindByAttr("class", "baz")
 	}
+}
+
+func testdata(filename string) (f *os.File) {
+	f, err := os.Open(path.Join("testdata", filename))
+	if err != nil {
+		panic(err)
+	}
+	return
 }
