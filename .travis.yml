@@ -1,0 +1,12 @@
+language: go
+go:
+  - 1.8.x
+  - 1.9.x
+
+before_install:
+  - go get github.com/mattn/goveralls
+  - make dep
+
+script:
+  - make go cover
+  - $HOME/gopath/bin/goveralls -coverprofile=cov -service=travis-ci
