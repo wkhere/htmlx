@@ -16,13 +16,13 @@ func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
 }
 
-func FinderFromReader(r io.Reader) (f Finder, err error) {
+func FinderFromData(r io.Reader) (f Finder, err error) {
 	h, err := html.Parse(r)
 	return Finder{h}, err
 }
 
 func FinderFromString(s string) (Finder, error) {
-	return FinderFromReader(bytes.NewBufferString(s))
+	return FinderFromData(bytes.NewBufferString(s))
 }
 
 func (f Finder) IsEmpty() bool {

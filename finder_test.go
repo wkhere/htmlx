@@ -55,7 +55,7 @@ func TestFromString(t *testing.T) {
 func TestFind(t *testing.T) {
 	var s string
 
-	top, _ := FinderFromReader(testdata("simple.html"))
+	top, _ := FinderFromData(testdata("simple.html"))
 
 	id1 := top.FindById("id1")
 
