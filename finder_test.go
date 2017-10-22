@@ -98,8 +98,11 @@ func TestFind(t *testing.T) {
 	}
 }
 
-// todo: discover why it got slower.
-// maybe (f Finder) -> (f *Finder) ?
+// BenchmarkFind measurements were done on `metal` machine, perf mode.
+// Adding closures raises execution time from 210 ns/op to 231 ns/op.
+// Now with Finder struct & methods it's 328ns/op.
+// Todo: discover why it got slower.
+// Maybe (f Finder) -> (f *Finder) ?
 func BenchmarkFind(b *testing.B) {
 	f, _ := FinderFromString(`
 		<div>

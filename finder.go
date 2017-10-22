@@ -51,11 +51,6 @@ type FinderPredicate func(*html.Node) bool
 
 // Find is universal finder.
 // Includes current node in search.
-// Note that adding closures raises execution time
-// from 210 ns/op to 231 ns/op. Can live with it.
-// (Measurements done on `metal` machine, perf mode.)
-// Btw measures above are obsolete, they predate use
-// of Finder struct and methods.
 func (f Finder) Find(pred FinderPredicate) (r Finder) {
 	if f.Node == nil {
 		return
