@@ -5,6 +5,7 @@ Finder family:
 	- FindInSiblings (recursive)
 	+ FindByClass
 	- why it got slower
+	- concurrency?
 
 parsehtml binary:
 	- parse also local files
