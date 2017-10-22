@@ -27,6 +27,16 @@ func TestEmpty(t *testing.T) {
 	}
 }
 
+func TestFromString(t *testing.T) {
+	top, _ := FinderFromString(`<div id="1"></div>`)
+
+	div := top.FindElement(atom.Div)
+
+	if res := top.FindById("1"); res != div {
+		t.Errorf("mismatch")
+	}
+}
+
 func TestFind(t *testing.T) {
 	var s string
 	r, err := os.Open("testdata/simple.html")
