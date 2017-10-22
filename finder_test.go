@@ -1,6 +1,7 @@
 package htmlx
 
 import (
+	"os"
 	"testing"
 
 	"golang.org/x/net/html/atom"
@@ -28,18 +29,13 @@ func TestEmpty(t *testing.T) {
 
 func TestFind(t *testing.T) {
 	var s string
-	top, _ := FinderFromString(`
-		<div>
-			<div id="id1">
-				<span class="foo">1st</span>
-				<span id="id2" class="bar other" attr2="boom">2nd</span>
-				<span class="bar another">3rd</span>
-				<div>
-					<span class="xyz yet-another">inner</span>
-				</div>
-			</div>
-		</div>
-	`)
+	r, err := os.Open("testdata/simple.html")
+	if err != nil {
+		panic(err)
+	}
+
+	top, _ := FinderFromReader(r)
+
 	id1 := top.FindById("id1")
 
 	span1 := id1.FindElement(atom.Span)
