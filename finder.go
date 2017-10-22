@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	"io"
 	"strings"
 )
 
@@ -15,9 +16,13 @@ func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
 }
 
-func FinderFromString(s string) (f Finder, err error) {
-	h, err := html.Parse(bytes.NewBufferString(s))
+func FinderFromReader(r io.Reader) (f Finder, err error) {
+	h, err := html.Parse(r)
 	return Finder{h}, err
+}
+
+func FinderFromString(s string) (Finder, error) {
+	return FinderFromReader(bytes.NewBufferString(s))
 }
 
 func (f Finder) IsEmpty() bool {
