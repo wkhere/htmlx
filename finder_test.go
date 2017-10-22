@@ -115,12 +115,12 @@ func TestFind(t *testing.T) {
 	}
 }
 
-// BenchmarkFind measurements were done on `metal` machine, perf mode.
+// Measurements were done on `metal` machine, perf mode.
 // Adding closures raises execution time from 210 ns/op to 231 ns/op.
 // Now with Finder struct & methods it's 328ns/op.
 // Todo: discover why it got slower.
 // Maybe (f Finder) -> (f *Finder) ?
-func BenchmarkFind(b *testing.B) {
+func BenchmarkBasic(b *testing.B) {
 	f, _ := FinderFromString(`
 		<div>
 			<div id="id1">
@@ -133,6 +133,13 @@ func BenchmarkFind(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		id1 := f.FindById("id1")
 		id1.FindByAttr("class", "baz")
+	}
+}
+
+func BenchmarkGoV(b *testing.B) {
+	f, _ := FinderFromData(testdata("gatesofvienna.html"))
+	for n := 0; n < b.N; n++ {
+		f.FindByClass("html-end-of-file")
 	}
 }
 
