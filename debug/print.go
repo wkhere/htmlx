@@ -29,5 +29,4 @@ func PrintHTML(top *html.Node) {
 	}
 
 	f(top, 0)
-	return
 }
