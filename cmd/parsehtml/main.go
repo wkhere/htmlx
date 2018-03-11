@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,12 +12,29 @@ import (
 	"golang.org/x/net/html"
 )
 
+var (
+	compactSpaces = flag.Bool("compact-spaces", true,
+		"print SPC if element data contains only spaces")
+	trimAttr = flag.Bool("trim-attr", true,
+		"don't print empty attributes")
+)
+
+func perrf(format string, vs ...interface{}) {
+	fmt.Fprintf(os.Stderr, format, vs...)
+}
+
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s url-or-file\n", os.Args[0])
+	perrf("Usage:\n")
+	perrf("\t%s [flags] http(s)://url\n", os.Args[0])
+	perrf("\t%s [flags] file://path\n", os.Args[0])
+	perrf("\t%s [flags] path\n", os.Args[0])
+	perrf("\t%s [flags] - <file \n", os.Args[0])
+	perrf("Flags:\n")
+	flag.PrintDefaults()
 }
 
 func die(err error) {
-	fmt.Fprintf(os.Stderr, "%s: %v\n", os.Args[0], err)
+	perrf("%s: %v\n", os.Args[0], err)
 	os.Exit(1)
 }
 
@@ -27,11 +45,15 @@ func dieIf(err error) {
 }
 
 func main() {
-	if len(os.Args) != 2 {
-		usage()
+	flag.Usage = usage
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) != 1 {
+		perrf("nothing to parse; supply url, file or - as an argument\n")
 		os.Exit(2)
 	}
-	url := os.Args[1]
+	url := args[0]
 	if !strings.Contains(url, "://") {
 		url = "file://" + url
 	}
@@ -61,5 +83,8 @@ func main() {
 	root, err := html.Parse(r)
 	dieIf(err)
 
-	debug.PrintHTML(root)
+	debug.NewPrinter(
+		debug.CompactSpaces(*compactSpaces),
+		debug.TrimEmptyAttr(*trimAttr),
+	).Print(root)
 }

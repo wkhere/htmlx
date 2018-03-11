@@ -16,12 +16,43 @@ var nodeTypes = map[html.NodeType]string{
 	html.CommentNode:  "COMMENT",
 }
 
-func PrintHTML(top *html.Node) {
+type Printer struct {
+	CompactSpaces bool
+	TrimEmptyAttr bool
+}
+
+func NewPrinter(opts ...func(*Printer)) *Printer {
+	p := Printer{}
+	for _, opt := range opts {
+		opt(&p)
+	}
+	return &p
+}
+
+func CompactSpaces(ok bool) func(*Printer) {
+	return func(p *Printer) { p.CompactSpaces = ok }
+}
+func TrimEmptyAttr(ok bool) func(*Printer) {
+	return func(p *Printer) { p.TrimEmptyAttr = ok }
+}
+
+func (p Printer) Print(top *html.Node) {
+
 	var f func(*html.Node, int)
 
 	f = func(node *html.Node, i int) {
-		fmt.Printf("%sT:%s D:`%s` A:%q\n", strings.Repeat(" ", i*2),
-			nodeTypes[node.Type], node.Data, node.Attr)
+		var dataRepr, attrRepr string
+		if p.CompactSpaces && len(strings.TrimSpace(node.Data)) == 0 {
+			dataRepr = "D:SPC"
+		} else {
+			dataRepr = fmt.Sprintf("D:`%s`", node.Data)
+		}
+		if !(p.TrimEmptyAttr && len(node.Attr) == 0) {
+			attrRepr = fmt.Sprintf("A:%q", node.Attr)
+		}
+
+		fmt.Printf("%sT:%s %s %s\n", strings.Repeat(" ", i*2),
+			nodeTypes[node.Type], dataRepr, attrRepr)
 
 		for c := node.FirstChild; c != nil; c = c.NextSibling {
 			f(c, i+1)
