@@ -55,7 +55,7 @@ func TestFromString(t *testing.T) {
 func TestFind(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 
-	id1 := top.FindById("id1")
+	id1 := top.FindById("1")
 
 	span1 := id1.FindElement(atom.Span)
 	span1text := span1.FirstChild().String()
@@ -78,7 +78,7 @@ func TestFind(t *testing.T) {
 			res.String(), span2.String())
 	}
 
-	if res := span1.FindSiblingById("id2"); res != span2 {
+	if res := span1.FindSiblingById("2"); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
