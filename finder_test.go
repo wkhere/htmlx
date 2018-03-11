@@ -53,25 +53,20 @@ func TestFromString(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	var s string
-
 	top, _ := FinderFromData(testdata("simple.html"))
 
 	id1 := top.FindById("id1")
 
 	span1 := id1.FindElement(atom.Span)
-	span1content := span1.FirstChild()
-	s = "1st"
-	if res := span1content.String(); res != s {
-		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", res, s)
+	span1text := span1.FirstChild().String()
+	if s := "1st"; span1text != s {
+		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span1text, s)
 	}
 
 	span2 := id1.FindByClass("bar")
-
-	span2content := span2.FirstChild()
-	s = "2nd"
-	if res := span2content.String(); res != s {
-		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", res, s)
+	span2text := span2.FirstChild().String()
+	if s := "2nd"; span2text != s {
+		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span2text, s)
 	}
 
 	if res := span1.FindSiblingElement(atom.Span); res != span2 {
@@ -96,8 +91,25 @@ func TestFind(t *testing.T) {
 	}
 
 	span3 := span2.FindSiblingElement(atom.Span)
+	span3text := span3.FirstChild().String()
+	if s := "3rd"; span3text != s {
+		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span3text, s)
+	}
+
 	if res := span2.FindSiblingByClass("bar"); res != span3 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span3)
+	}
+
+	spanInner := id1.FindByClass("xyz")
+	spanInnerText := spanInner.FirstChild().String()
+	if s := "inner"; spanInnerText != s {
+		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", spanInnerText, s)
+	}
+
+	div4 := span3.FindSiblingElement(atom.Div)
+
+	if res := div4.FindByClass("xyz"); res != spanInner {
+		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, spanInner)
 	}
 
 	badFinds := []Finder{
@@ -106,6 +118,7 @@ func TestFind(t *testing.T) {
 		id1.NextSibling().FindSiblingById("any"),
 		id1.FirstChild().FindSiblingById("bad"),
 		span1.FindSiblingByClass("xyz"),
+		div4.FindByClass("another"),
 	}
 
 	for i, bad := range badFinds {
