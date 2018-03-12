@@ -29,6 +29,7 @@ func usage() {
 	perrf("\t%s [flags] file://path\n", os.Args[0])
 	perrf("\t%s [flags] path\n", os.Args[0])
 	perrf("\t%s [flags] - <file \n", os.Args[0])
+	perrf("\t%s [flags] one_input another_input \n", os.Args[0])
 	perrf("Flags:\n")
 	flag.PrintDefaults()
 }
@@ -49,11 +50,18 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if len(args) != 1 {
-		perrf("nothing to parse; supply url, file or - as an argument\n")
+	if len(args) == 0 {
+		perrf("nothing to parse; supply url, file or - as arguments\n")
 		os.Exit(2)
 	}
-	url := args[0]
+
+	for _, arg := range args {
+		process(arg)
+	}
+}
+
+func process(url string) {
+
 	if !strings.Contains(url, "://") {
 		url = "file://" + url
 	}
