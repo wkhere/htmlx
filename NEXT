@@ -15,3 +15,4 @@ parsehtml binary:
 	+ parse also local files
 	+ show whitespace-only data in a compact way
 	+ trim empty attributes
+	- coverage
