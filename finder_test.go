@@ -128,6 +128,20 @@ func TestFind(t *testing.T) {
 	}
 }
 
+func TestDepthFind(t *testing.T) {
+	top, _ := FinderFromString(`
+		<div id="1">
+		  <span id="inner"></span>
+		</div>
+		<span id="2"></span>
+	`)
+
+	e := top.FindElement(atom.Span)
+	if v, _ := e.Id(); v != "inner" {
+		t.Errorf("expected to find inner element, got: id=`%v`", v)
+	}
+}
+
 func TestAttrShortcuts(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 
