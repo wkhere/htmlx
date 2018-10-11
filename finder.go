@@ -2,10 +2,11 @@ package htmlx
 
 import (
 	"bytes"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
 	"io"
 	"strings"
+
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 type Finder struct {
