@@ -52,6 +52,54 @@ func (f Finder) NextSibling() Finder {
 	return Finder{f.Node.NextSibling}
 }
 
+func (f Finder) AttrVal(key string) (val string, ok bool) {
+	if f.Node == nil {
+		return val, false
+	}
+	return AttrVal(f.Node.Attr, key)
+}
+
+func (f Finder) Id() (id string, ok bool) {
+	return f.AttrVal("id")
+}
+
+func (f Finder) ClassList() (classes []string, ok bool) {
+	classStr, ok := f.AttrVal("class")
+	if !ok {
+		return classes, false
+	}
+	return strings.Fields(classStr), ok
+}
+
+func (f Finder) HasAttr(key string) bool {
+	if f.Node == nil {
+		return false
+	}
+	return HasAttr(f.Node.Attr, key)
+}
+
+func (f Finder) HasAttrVal(key, val string) bool {
+	if f.Node == nil {
+		return false
+	}
+	return HasAttrVal(f.Node.Attr, key, val)
+}
+
+func (f Finder) HasAttrWord(key, word string) bool {
+	if f.Node == nil {
+		return false
+	}
+	return HasAttrWord(f.Node.Attr, key, word)
+}
+
+func (f Finder) HasId(id string) bool {
+	return f.HasAttrVal("id", id)
+}
+
+func (f Finder) HasClass(class string) bool {
+	return f.HasAttrWord("class", class)
+}
+
 type FinderPredicate func(*html.Node) bool
 
 // Find is universal finder.
@@ -148,6 +196,15 @@ func AttrVal(attr []html.Attribute, key string) (val string, ok bool) {
 	for _, a := range attr {
 		if a.Key == key {
 			return a.Val, true
+		}
+	}
+	return
+}
+
+func HasAttr(attr []html.Attribute, key string) (ok bool) {
+	for _, a := range attr {
+		if a.Key == key {
+			return true
 		}
 	}
 	return

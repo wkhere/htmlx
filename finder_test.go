@@ -128,6 +128,64 @@ func TestFind(t *testing.T) {
 	}
 }
 
+func TestAttrShortcuts(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+
+	e := top.FindById("2")
+
+	if v, _ := e.AttrVal("attr2"); v != "boom" {
+		t.Errorf("mismatch:\ngot `%v`\nexp `boom`", v)
+	}
+	if _, ok := e.AttrVal("attr_nonexistent"); ok {
+		t.Errorf("mismatch:\ngot ok=true\nexp ok=false")
+	}
+	if v, _ := e.Id(); v != "2" {
+		t.Errorf("mismatch:\ngot id=`%v`\nexp id=`2`", v)
+	}
+	if cs, _ := e.ClassList(); cs[0] != "bar" {
+		t.Errorf("e.ClassList()[0] should be `bar`")
+	}
+	if !e.HasAttr("attr2") {
+		t.Errorf(`e.HasAttr("attr2") should be true`)
+	}
+	if e.HasAttr("attr_nonexistent") {
+		t.Errorf(`e.HasAttr("attr_nonexistent") should be false`)
+	}
+	if !e.HasAttrVal("attr2", "boom") {
+		t.Errorf(`e.HasAttrVal("attr2", "boom") should be true`)
+	}
+	if !e.HasId("2") {
+		t.Errorf(`e.HasId("2") should be true`)
+	}
+	if e.HasId("bad_id") {
+		t.Errorf(`e.HasId("bad_id") should be false`)
+	}
+	if !e.HasClass("bar") {
+		t.Errorf(`e.HasClass("bar") should be true`)
+	}
+	if e.HasClass("class_nonexistent") {
+		t.Errorf(`e.HasClass("class_nonexistent") should be false`)
+	}
+}
+
+func TestEmptyFinderAttr(t *testing.T) {
+	f := Finder{}
+
+	tab := []bool{
+		func() bool { _, ok := f.Id(); return ok }(),
+		func() bool { _, ok := f.ClassList(); return ok }(),
+		f.HasAttr("any"),
+		f.HasId("any"),
+		f.HasClass("any"),
+	}
+
+	for i, tc := range tab {
+		if tc {
+			t.Errorf("tc[%d] should be false", i)
+		}
+	}
+}
+
 // Measurements were done on `metal` machine, perf mode.
 // Adding closures raises execution time from 210 ns/op to 231 ns/op.
 // Now with Finder struct & methods it's 328ns/op.
