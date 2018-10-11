@@ -91,8 +91,8 @@ func process(url string) {
 	root, err := html.Parse(r)
 	dieIf(err)
 
-	debug.NewPrinter(
-		debug.CompactSpaces(*compactSpaces),
-		debug.TrimEmptyAttr(*trimAttr),
-	).Print(root)
+	debug.Printer{
+		CompactSpaces: *compactSpaces,
+		TrimEmptyAttr: *trimAttr,
+	}.Print(root)
 }

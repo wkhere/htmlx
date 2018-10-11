@@ -21,21 +21,6 @@ type Printer struct {
 	TrimEmptyAttr bool
 }
 
-func NewPrinter(opts ...func(*Printer)) *Printer {
-	p := Printer{}
-	for _, opt := range opts {
-		opt(&p)
-	}
-	return &p
-}
-
-func CompactSpaces(ok bool) func(*Printer) {
-	return func(p *Printer) { p.CompactSpaces = ok }
-}
-func TrimEmptyAttr(ok bool) func(*Printer) {
-	return func(p *Printer) { p.TrimEmptyAttr = ok }
-}
-
 func (p Printer) Print(top *html.Node) {
 
 	var f func(*html.Node, int)
