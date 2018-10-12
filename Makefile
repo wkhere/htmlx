@@ -3,8 +3,8 @@ go:
 	go test -cover	.
 	go install	./...
 
-benchmark:
-	go test -bench=. .
+bench:
+	go test -bench=. -benchmem .
 
 cover:
 	go test -coverprofile=cov
