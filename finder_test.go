@@ -5,6 +5,8 @@ import (
 	"path"
 	"testing"
 
+	p "github.com/wkhere/htmlx/pred"
+
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -15,10 +17,10 @@ func TestEmpty(t *testing.T) {
 	if !empty.IsEmpty() {
 		t.Errorf("expected finder to be empty")
 	}
-	if empty.FindById("whatever") != empty {
+	if empty.Find(p.ID("whatever")) != empty {
 		t.Errorf("expected empty.Find to return also empty finder")
 	}
-	if empty.FindSiblingById("whatever") != empty {
+	if empty.FindSibling(p.ID("whatever")) != empty {
 		t.Errorf("expected empty.FindSibling to return also empty finder")
 	}
 	if empty.FirstChild() != empty {
@@ -35,9 +37,9 @@ func TestEmpty(t *testing.T) {
 func TestFromNode(t *testing.T) {
 	node, _ := html.Parse(testdata("simple.html"))
 	top := FinderFromNode(node)
-	div0 := top.FindElement(atom.Div)
+	div0 := top.Find(p.Element(atom.Div))
 
-	if div0.FindByClass("bar") != div0.FindByClass("other") {
+	if div0.Find(p.Class("bar")) != div0.Find(p.Class("other")) {
 		t.Errorf("mismatch")
 	}
 }
@@ -45,9 +47,9 @@ func TestFromNode(t *testing.T) {
 func TestFromString(t *testing.T) {
 	top, _ := FinderFromString(`<div id="1"></div>`)
 
-	div := top.FindElement(atom.Div)
+	div := top.Find(p.Element(atom.Div))
 
-	if res := top.FindById("1"); res != div {
+	if res := top.Find(p.ID("1")); res != div {
 		t.Errorf("mismatch")
 	}
 }
@@ -55,70 +57,70 @@ func TestFromString(t *testing.T) {
 func TestFind(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 
-	id1 := top.FindById("1")
+	id1 := top.Find(p.ID("1"))
 
-	span1 := id1.FindElement(atom.Span)
+	span1 := id1.Find(p.Element(atom.Span))
 	span1text := span1.FirstChild().String()
 	if s := "1st"; span1text != s {
 		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span1text, s)
 	}
 
-	span2 := id1.FindByClass("bar")
+	span2 := id1.Find(p.Class("bar"))
 	span2text := span2.FirstChild().String()
 	if s := "2nd"; span2text != s {
 		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span2text, s)
 	}
 
-	if res := span1.FindSiblingElement(atom.Span); res != span2 {
+	if res := span1.FindSibling(p.Element(atom.Span)); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
-	if res := span1.FindSiblingByClass("bar"); res != span2 {
+	if res := span1.FindSibling(p.Class("bar")); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`",
 			res.String(), span2.String())
 	}
 
-	if res := span1.FindSiblingById("2"); res != span2 {
+	if res := span1.FindSibling(p.ID("2")); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
-	if res := id1.FindByAttr("attr2", "boom"); res != span2 {
+	if res := id1.Find(p.Attr("attr2", "boom")); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
-	if res := span1.FindSiblingByAttr("attr2", "boom"); res != span2 {
+	if res := span1.FindSibling(p.Attr("attr2", "boom")); res != span2 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span2)
 	}
 
-	span3 := span2.FindSiblingElement(atom.Span)
+	span3 := span2.FindSibling(p.Element(atom.Span))
 	span3text := span3.FirstChild().String()
 	if s := "3rd"; span3text != s {
 		t.Errorf("mismatch:\ngot `%s`\nexp `%s`", span3text, s)
 	}
 
-	if res := span2.FindSiblingByClass("bar"); res != span3 {
+	if res := span2.FindSibling(p.Class("bar")); res != span3 {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, span3)
 	}
 
-	spanInner := id1.FindByClass("xyz")
+	spanInner := id1.Find(p.Class("xyz"))
 	spanInnerText := spanInner.FirstChild().String()
 	if s := "inner"; spanInnerText != s {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", spanInnerText, s)
 	}
 
-	div4 := span3.FindSiblingElement(atom.Div)
+	div4 := span3.FindSibling(p.Element(atom.Div))
 
-	if res := div4.FindByClass("xyz"); res != spanInner {
+	if res := div4.Find(p.Class("xyz")); res != spanInner {
 		t.Errorf("mismatch:\ngot `%v`\nexp `%v`", res, spanInner)
 	}
 
 	badFinds := []Finder{
-		top.FindById("bad"),
-		id1.FindByClass("bad"),
-		id1.NextSibling().FindSiblingById("any"),
-		id1.FirstChild().FindSiblingById("bad"),
-		span1.FindSiblingByClass("xyz"),
-		div4.FindByClass("another"),
+		top.Find(p.ID("bad")),
+		id1.Find(p.Class("bad")),
+		id1.NextSibling().FindSibling(p.ID("any")),
+		id1.FirstChild().FindSibling(p.ID("bad")),
+		span1.FindSibling(p.Class("xyz")),
+		div4.Find(p.Class("another")),
 	}
 
 	for i, bad := range badFinds {
@@ -136,8 +138,8 @@ func TestDepthFind(t *testing.T) {
 		<span id="2"></span>
 	`)
 
-	e := top.FindElement(atom.Span)
-	if v, _ := e.Id(); v != "inner" {
+	e := top.Find(p.Element(atom.Span))
+	if v, _ := e.Attr().ID(); v != "inner" {
 		t.Errorf("expected to find inner element, got: id=`%v`", v)
 	}
 }
@@ -145,39 +147,39 @@ func TestDepthFind(t *testing.T) {
 func TestAttrShortcuts(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 
-	e := top.FindById("2")
+	e := top.Find(p.ID("2"))
 
-	if v, _ := e.AttrVal("attr2"); v != "boom" {
+	if v, _ := e.Attr().Val("attr2"); v != "boom" {
 		t.Errorf("mismatch:\ngot `%v`\nexp `boom`", v)
 	}
-	if _, ok := e.AttrVal("attr_nonexistent"); ok {
+	if _, ok := e.Attr().Val("attr_nonexistent"); ok {
 		t.Errorf("mismatch:\ngot ok=true\nexp ok=false")
 	}
-	if v, _ := e.Id(); v != "2" {
+	if v, _ := e.Attr().ID(); v != "2" {
 		t.Errorf("mismatch:\ngot id=`%v`\nexp id=`2`", v)
 	}
-	if cs, _ := e.ClassList(); cs[0] != "bar" {
+	if cs, _ := e.Attr().ClassList(); cs[0] != "bar" {
 		t.Errorf("e.ClassList()[0] should be `bar`")
 	}
-	if !e.HasAttr("attr2") {
+	if !e.Attr().Exists("attr2") {
 		t.Errorf(`e.HasAttr("attr2") should be true`)
 	}
-	if e.HasAttr("attr_nonexistent") {
+	if e.Attr().Exists("attr_nonexistent") {
 		t.Errorf(`e.HasAttr("attr_nonexistent") should be false`)
 	}
-	if !e.HasAttrVal("attr2", "boom") {
+	if !e.Attr().HasVal("attr2", "boom") {
 		t.Errorf(`e.HasAttrVal("attr2", "boom") should be true`)
 	}
-	if !e.HasId("2") {
+	if !e.Attr().HasID("2") {
 		t.Errorf(`e.HasId("2") should be true`)
 	}
-	if e.HasId("bad_id") {
+	if e.Attr().HasID("bad_id") {
 		t.Errorf(`e.HasId("bad_id") should be false`)
 	}
-	if !e.HasClass("bar") {
+	if !e.Attr().HasClass("bar") {
 		t.Errorf(`e.HasClass("bar") should be true`)
 	}
-	if e.HasClass("class_nonexistent") {
+	if e.Attr().HasClass("class_nonexistent") {
 		t.Errorf(`e.HasClass("class_nonexistent") should be false`)
 	}
 }
@@ -186,11 +188,11 @@ func TestEmptyFinderAttr(t *testing.T) {
 	f := Finder{}
 
 	tab := []bool{
-		func() bool { _, ok := f.Id(); return ok }(),
-		func() bool { _, ok := f.ClassList(); return ok }(),
-		f.HasAttr("any"),
-		f.HasId("any"),
-		f.HasClass("any"),
+		func() bool { _, ok := f.Attr().ID(); return ok }(),
+		func() bool { _, ok := f.Attr().ClassList(); return ok }(),
+		f.Attr().Exists("any"),
+		f.Attr().HasID("any"),
+		f.Attr().HasClass("any"),
 	}
 
 	for i, tc := range tab {
@@ -216,15 +218,15 @@ func BenchmarkBasic(b *testing.B) {
 		</div>
 	`)
 	for n := 0; n < b.N; n++ {
-		id1 := f.FindById("id1")
-		id1.FindByAttr("class", "baz")
+		id1 := f.Find(p.ID("id1"))
+		id1.Find(p.Attr("class", "baz"))
 	}
 }
 
 func BenchmarkGoV(b *testing.B) {
 	f, _ := FinderFromData(testdata("gatesofvienna.html"))
 	for n := 0; n < b.N; n++ {
-		f.FindByClass("html-end-of-file")
+		f.Find(p.Class("html-end-of-file"))
 	}
 }
 
