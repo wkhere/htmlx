@@ -7,6 +7,9 @@ Finder family:
 	- why it got slower
 	- concurrency?
 
+	possible optimization: type Finder *html.Node,
+	this is against the spec (receiver base type can't be pointer)
+
 	think of some vm for searching!
 	then use a language to describe a search
 	inspired by rsc's regexp2 article
