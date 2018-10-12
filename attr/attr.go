@@ -22,12 +22,12 @@ func (l L) ID() (string, bool) {
 	return l.Val("id")
 }
 
-func (l L) ClassList() (classes []string, ok bool) {
+func (l L) ClassList() ([]string, bool) {
 	classStr, ok := l.Val("class")
 	if !ok {
-		return classes, false
+		return nil, false
 	}
-	return strings.Fields(classStr), ok
+	return strings.Fields(classStr), true
 }
 
 func (l L) Exists(key string) (ok bool) {

@@ -18,7 +18,7 @@ func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
 }
 
-func FinderFromData(r io.Reader) (f Finder, err error) {
+func FinderFromData(r io.Reader) (Finder, error) {
 	h, err := html.Parse(r)
 	return Finder{h}, err
 }
@@ -54,9 +54,9 @@ func (f Finder) NextSibling() Finder {
 	return Finder{f.Node.NextSibling}
 }
 
-func (f Finder) Attr() (aa attr.List) {
+func (f Finder) Attr() attr.List {
 	if f.Node == nil {
-		return aa
+		return nil
 	}
 	return f.Node.Attr
 }
