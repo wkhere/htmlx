@@ -61,12 +61,13 @@ func (f Finder) Attr() attr.List {
 	return f.Node.Attr
 }
 
-// Find is universal finder.
-// Includes current node in search.
+// Find performs universal depth-first find.
+// Includes current node in the search.
 func (f Finder) Find(pred pred.Predicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
+
 	var walker func(node *html.Node) bool
 
 	walker = func(node *html.Node) bool {
