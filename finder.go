@@ -40,11 +40,32 @@ func (f Finder) String() string {
 	return b.String()
 }
 
+func (f Finder) Parent() Finder {
+	if f.Node == nil {
+		return f
+	}
+	return Finder{f.Node.Parent}
+}
+
 func (f Finder) FirstChild() Finder {
 	if f.Node == nil {
 		return f
 	}
 	return Finder{f.Node.FirstChild}
+}
+
+func (f Finder) LastChild() Finder {
+	if f.Node == nil {
+		return f
+	}
+	return Finder{f.Node.LastChild}
+}
+
+func (f Finder) PrevSibling() Finder {
+	if f.Node == nil {
+		return f
+	}
+	return Finder{f.Node.PrevSibling}
 }
 
 func (f Finder) NextSibling() Finder {
@@ -87,14 +108,29 @@ func (f Finder) Find(pred pred.Predicate) (r Finder) {
 	return
 }
 
-// FindSibling performs flat find among node's siblings.
-// No recursion. Omits current node, starts from a first sibling.
+// FindSibling performs flat find among node's next (right) siblings.
+// No recursion. Omits current node, starts from a first such sibling.
 func (f Finder) FindSibling(pred pred.Predicate) (r Finder) {
 	if f.Node == nil {
 		return
 	}
 
 	for c := f.Node.NextSibling; c != nil; c = c.NextSibling {
+		if pred(c) {
+			return Finder{c}
+		}
+	}
+	return
+}
+
+// FindPrevSibling performs flat find among node's previous (left) siblings.
+// No recursion. Omits current node, starts from a first such sibling.
+func (f Finder) FindPrevSibling(pred pred.Predicate) (r Finder) {
+	if f.Node == nil {
+		return
+	}
+
+	for c := f.Node.PrevSibling; c != nil; c = c.PrevSibling {
 		if pred(c) {
 			return Finder{c}
 		}
