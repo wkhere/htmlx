@@ -47,6 +47,14 @@ func (l L) HasVal(key, val string) bool {
 	return val == foundVal
 }
 
+func (l L) HasValCond(key string, p func(string) bool) bool {
+	foundVal, ok := l.Val(key)
+	if !ok {
+		return false
+	}
+	return p(foundVal)
+}
+
 func (l L) HasWord(key, word string) bool {
 	foundVal, ok := l.Val(key)
 	if !ok {
@@ -60,10 +68,31 @@ func (l L) HasWord(key, word string) bool {
 	return false
 }
 
+func (l L) HasWordCond(key string, p func(string) bool) bool {
+	foundVal, ok := l.Val(key)
+	if !ok {
+		return false
+	}
+	for _, w := range strings.Fields(foundVal) {
+		if p(w) {
+			return true
+		}
+	}
+	return false
+}
+
 func (l L) HasID(id string) bool {
 	return l.HasVal("id", id)
 }
 
+func (l L) HasIDCond(p func(string) bool) bool {
+	return l.HasValCond("id", p)
+}
+
 func (l L) HasClass(class string) bool {
 	return l.HasWord("class", class)
+}
+
+func (l L) HasClassCond(p func(string) bool) bool {
+	return l.HasWordCond("class", p)
 }

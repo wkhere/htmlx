@@ -3,6 +3,7 @@ package htmlx
 import (
 	"os"
 	"path"
+	"regexp"
 	"testing"
 
 	p "github.com/wkhere/htmlx/pred"
@@ -159,28 +160,73 @@ func TestAttrShortcuts(t *testing.T) {
 		t.Errorf("mismatch:\ngot id=`%v`\nexp id=`2`", v)
 	}
 	if cs, _ := e.Attr().ClassList(); cs[0] != "bar" {
-		t.Errorf("e.ClassList()[0] should be `bar`")
+		t.Errorf("e.a.ClassList()[0] should be `bar`")
 	}
 	if !e.Attr().Exists("attr2") {
-		t.Errorf(`e.HasAttr("attr2") should be true`)
+		t.Errorf(`e.a.HasAttr("attr2") should be true`)
 	}
 	if e.Attr().Exists("attr_nonexistent") {
-		t.Errorf(`e.HasAttr("attr_nonexistent") should be false`)
+		t.Errorf(`e.a.HasAttr("attr_nonexistent") should be false`)
 	}
 	if !e.Attr().HasVal("attr2", "boom") {
-		t.Errorf(`e.HasAttrVal("attr2", "boom") should be true`)
+		t.Errorf(`e.a.HasAttrVal("attr2", "boom") should be true`)
 	}
 	if !e.Attr().HasID("2") {
-		t.Errorf(`e.HasId("2") should be true`)
+		t.Errorf(`e.a.HasId("2") should be true`)
 	}
 	if e.Attr().HasID("bad_id") {
-		t.Errorf(`e.HasId("bad_id") should be false`)
+		t.Errorf(`e.a.HasId("bad_id") should be false`)
 	}
 	if !e.Attr().HasClass("bar") {
-		t.Errorf(`e.HasClass("bar") should be true`)
+		t.Errorf(`e.a.HasClass("bar") should be true`)
 	}
 	if e.Attr().HasClass("class_nonexistent") {
-		t.Errorf(`e.HasClass("class_nonexistent") should be false`)
+		t.Errorf(`e.a.HasClass("class_nonexistent") should be false`)
+	}
+
+	if !e.Attr().HasClassCond(regexp.MustCompile("[oO]ther").MatchString) {
+		t.Errorf(`e.a.HasClassCond(r"[oO]ther".MatchString) should be true`)
+	}
+}
+
+func TestPredShortcuts(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+	var r *regexp.Regexp
+	var e Finder
+
+	e = top.Find(p.InnerText("2nd"))
+	if !e.Attr().HasID("2") {
+		t.Errorf(`failed to find inner text "2nd"`)
+	}
+
+	r = regexp.MustCompile("3rd")
+	e = top.Find(p.InnerTextCond(r.MatchString))
+	if !e.Attr().HasClass("bar") {
+		t.Errorf(`failed to find inner text r"3rd"`)
+	}
+
+	r = regexp.MustCompile("[oO]ther")
+	e = top.Find(p.ClassCond(r.MatchString))
+	if !e.Attr().HasID("2") {
+		t.Errorf(`failed to find class r"[oO]ther"`)
+	}
+
+	r = regexp.MustCompile("2")
+	e = top.Find(p.IDCond(r.MatchString))
+	if !e.Attr().HasID("2") {
+		t.Errorf(`failed to find ID r"2"`)
+	}
+
+	r = regexp.MustCompile("bo.m")
+	e = top.Find(p.AttrCond("attr2", r.MatchString))
+	if !e.Attr().HasID("2") {
+		t.Errorf(`failed to find attr in "attr2" by r"bo.m"`)
+	}
+
+	r = regexp.MustCompile("xyz")
+	e = top.Find(p.AttrWordCond("class", r.MatchString))
+	if !e.Attr().HasClass("xyz") {
+		t.Errorf(`failed to find attr word in "class" by r"xyz"`)
 	}
 }
 
