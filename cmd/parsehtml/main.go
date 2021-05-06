@@ -14,7 +14,7 @@ import (
 
 var (
 	compactSpaces = flag.Bool("compact-spaces", true,
-		"print SPC if element data contains only spaces")
+		"print SPC/LF etc if element data contains only spaces")
 	trimAttr = flag.Bool("trim-attr", true,
 		"don't print empty attributes")
 )
