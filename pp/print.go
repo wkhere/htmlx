@@ -86,7 +86,6 @@ func ppSpaces(s string) string {
 			i++
 		}
 	}
-	a = r
 
 	pp := func(tok token) string {
 		if tok.cnt == 1 {
