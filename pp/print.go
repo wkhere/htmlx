@@ -1,8 +1,8 @@
 package pp
 
 import (
-	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -123,19 +123,21 @@ func ppSpaces(s string) string {
 		}
 	}
 
-	pp := func(tok token) string {
+	bpp := func(b *strings.Builder, tok token) {
 		if tok.cnt == 1 {
-			return tok.val
+			b.WriteString(tok.val)
+			return
 		}
-		return fmt.Sprintf("%sx%d", tok.val, tok.cnt)
+		b.WriteString(tok.val)
+		b.WriteByte('x')
+		b.WriteString(strconv.Itoa(tok.cnt))
 	}
 
 	b := new(strings.Builder)
-
-	b.WriteString(pp(r[0]))
+	bpp(b, r[0])
 	for _, tok := range r[1:] {
 		b.WriteByte(',')
-		b.WriteString(pp(tok))
+		bpp(b, tok)
 	}
 	return b.String()
 }
