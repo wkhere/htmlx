@@ -31,10 +31,10 @@ func (p Printer) Print(w io.Writer, top *html.Node) {
 		if p.CompactSpaces && len(strings.TrimSpace(node.Data)) == 0 {
 			dataRepr = "D:" + ppSpaces(node.Data)
 		} else {
-			dataRepr = fmt.Sprintf("D:`%s`", node.Data)
+			dataRepr = "D:`" + node.Data + "`"
 		}
 		if !(p.TrimEmptyAttr && len(node.Attr) == 0) {
-			attrRepr = fmt.Sprintf("A:%q", node.Attr)
+			attrRepr = "A:" + ppAttr(node.Attr)
 		}
 
 		fmt.Fprintf(w, "%sT:%s %s %s\n", strings.Repeat(" ", i*2),
@@ -46,6 +46,34 @@ func (p Printer) Print(w io.Writer, top *html.Node) {
 	}
 
 	f(top, 0)
+}
+
+func ppAttr(aa []html.Attribute) string {
+	if len(aa) == 0 {
+		return ""
+	}
+	b := new(strings.Builder)
+	b.WriteByte('[')
+	bppAttr1(b, aa[0])
+	for _, a := range aa[1:] {
+		b.WriteByte(' ')
+		bppAttr1(b, a)
+	}
+	b.WriteByte(']')
+	return b.String()
+}
+
+func bppAttr1(b *strings.Builder, a html.Attribute) {
+	if a.Namespace != "" {
+		b.WriteString(a.Namespace)
+		b.WriteByte(':')
+	}
+	b.WriteString(a.Key)
+	if a.Val != "" {
+		b.WriteString(`="`)
+		b.WriteString(a.Val)
+		b.WriteByte('"')
+	}
 }
 
 // ppSpaces pretty prints various whitespaces, possibly with counters.
