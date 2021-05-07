@@ -19,23 +19,24 @@ var (
 		"don't print empty attributes")
 )
 
-func perrf(format string, vs ...interface{}) {
-	fmt.Fprintf(os.Stderr, format, vs...)
+func perr(a ...interface{}) {
+	fmt.Fprintln(os.Stderr, a...)
 }
 
 func usage() {
-	perrf("Usage:\n")
-	perrf("\t%s [flags] http(s)://url\n", os.Args[0])
-	perrf("\t%s [flags] file://path\n", os.Args[0])
-	perrf("\t%s [flags] path\n", os.Args[0])
-	perrf("\t%s [flags] - <file \n", os.Args[0])
-	perrf("\t%s [flags] one_input another_input \n", os.Args[0])
-	perrf("Flags:\n")
+	perr("Usage:")
+	const pname = "parsehtml"
+	perr("\tparsehtml [flags] http(s)://url")
+	perr("\tparsehtml [flags] file://path")
+	perr("\tparsehtml [flags] path")
+	perr("\tparsehtml [flags] - <file")
+	perr("\tparsehtml [flags] one_input another_input")
+	perr("Flags:")
 	flag.PrintDefaults()
 }
 
 func die(err error) {
-	perrf("%s: %v\n", os.Args[0], err)
+	perr("parsehtml:", err)
 	os.Exit(1)
 }
 
@@ -51,7 +52,7 @@ func main() {
 	args := flag.Args()
 
 	if len(args) == 0 {
-		perrf("nothing to parse; supply url, file or - as arguments\n")
+		perr("nothing to parse; supply url, file or - as arguments")
 		os.Exit(2)
 	}
 
