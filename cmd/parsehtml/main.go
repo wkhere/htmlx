@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/wkhere/htmlx/debug"
+	"github.com/wkhere/htmlx/pp"
 	"golang.org/x/net/html"
 )
 
@@ -92,7 +92,7 @@ func process(url string) {
 	root, err := html.Parse(r)
 	dieIf(err)
 
-	debug.Printer{
+	pp.Printer{
 		CompactSpaces: *compactSpaces,
 		TrimEmptyAttr: *trimAttr,
 	}.Print(root)
