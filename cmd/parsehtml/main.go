@@ -95,5 +95,5 @@ func process(url string) {
 	pp.Printer{
 		CompactSpaces: *compactSpaces,
 		TrimEmptyAttr: *trimAttr,
-	}.Print(root)
+	}.Print(os.Stdout, root)
 }

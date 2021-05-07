@@ -2,6 +2,7 @@ package pp
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -21,7 +22,7 @@ type Printer struct {
 	TrimEmptyAttr bool
 }
 
-func (p Printer) Print(top *html.Node) {
+func (p Printer) Print(w io.Writer, top *html.Node) {
 
 	var f func(*html.Node, int)
 
@@ -36,7 +37,7 @@ func (p Printer) Print(top *html.Node) {
 			attrRepr = fmt.Sprintf("A:%q", node.Attr)
 		}
 
-		fmt.Printf("%sT:%s %s %s\n", strings.Repeat(" ", i*2),
+		fmt.Fprintf(w, "%sT:%s %s %s\n", strings.Repeat(" ", i*2),
 			nodeTypes[node.Type], dataRepr, attrRepr)
 
 		for c := node.FirstChild; c != nil; c = c.NextSibling {
