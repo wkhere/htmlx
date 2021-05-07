@@ -29,16 +29,24 @@ func (p Printer) Print(w io.Writer, top *html.Node) {
 	f = func(node *html.Node, i int) {
 		var dataRepr, attrRepr string
 		if p.CompactSpaces && len(strings.TrimSpace(node.Data)) == 0 {
-			dataRepr = "D:" + ppSpaces(node.Data)
+			dataRepr = ppSpaces(node.Data)
 		} else {
-			dataRepr = "D:`" + node.Data + "`"
+			dataRepr = "`" + node.Data + "`"
 		}
 		if !(p.TrimEmptyAttr && len(node.Attr) == 0) {
-			attrRepr = "A:" + ppAttr(node.Attr)
+			attrRepr = ppAttr(node.Attr)
 		}
 
-		fmt.Fprintf(w, "%sT:%s %s %s\n", strings.Repeat(" ", i*2),
-			nodeTypes[node.Type], dataRepr, attrRepr)
+		io.WriteString(w, strings.Repeat(" ", i*2))
+		io.WriteString(w, "T:")
+		io.WriteString(w, nodeTypes[node.Type])
+		io.WriteString(w, " D:")
+		io.WriteString(w, dataRepr)
+		if attrRepr != "" {
+			io.WriteString(w, " A:")
+			io.WriteString(w, attrRepr)
+		}
+		w.Write([]byte{'\n'})
 
 		for c := node.FirstChild; c != nil; c = c.NextSibling {
 			f(c, i+1)
