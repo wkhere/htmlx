@@ -1,12 +1,12 @@
-sel=. # selection for bench
-
 go:
 	go fmt 		./...
 	go test -cover	.
 	go install	./...
 
 bench:
-	go test -bench=$(sel) -benchmem .
+	go test -bench=$(sel) -count $(cnt) -benchmem .
+sel=.
+cnt=5
 
 cover:
 	go test -coverprofile=cov
