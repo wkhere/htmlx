@@ -111,7 +111,7 @@ func (f Finder) Find(pred pred.Predicate) (r Finder) {
 		return
 	}
 
-	var walker func(node *html.Node) bool
+	var walker func(*html.Node) bool
 
 	walker = func(node *html.Node) bool {
 		if pred(node) {
@@ -142,7 +142,7 @@ func (f Finder) FindAll(pred pred.Predicate) FinderStream {
 		return ch
 	}
 
-	var walker func(node *html.Node)
+	var walker func(*html.Node)
 
 	walker = func(node *html.Node) {
 		if pred(node) {
