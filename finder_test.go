@@ -207,6 +207,10 @@ func TestFindAll(t *testing.T) {
 	if e, e0 := ff[2].FindPrevSibling(p.Element(atom.Span)), ff[1]; e != e0 {
 		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
 	}
+
+	if e, e0 := ff[3].Parent(), ff[2].FindSibling(p.Element(atom.Div)); e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
 }
 
 func TestFindAllEmpty(t *testing.T) {
