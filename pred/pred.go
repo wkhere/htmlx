@@ -78,3 +78,21 @@ func InnerTextCond(p func(string) bool) Predicate {
 			p(h.FirstChild.Data)
 	}
 }
+
+func Text(s string) Predicate {
+	return func(h *html.Node) bool {
+		return h.Type == html.TextNode && h.Data == s
+	}
+}
+
+func TextCond(p func(string) bool) Predicate {
+	return func(h *html.Node) bool {
+		return h.Type == html.TextNode && p(h.Data)
+	}
+}
+
+func IsText() Predicate {
+	return func(h *html.Node) bool {
+		return h.Type == html.TextNode
+	}
+}
