@@ -9,6 +9,10 @@ import (
 
 type Predicate func(*html.Node) bool
 
+func True() Predicate {
+	return func(*html.Node) bool { return true }
+}
+
 func Element(element atom.Atom) Predicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && h.DataAtom == element
