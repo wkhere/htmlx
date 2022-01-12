@@ -1,6 +1,8 @@
 package htmlx
 
 import (
+	"bytes"
+	"io"
 	"os"
 	"path"
 	"regexp"
@@ -142,6 +144,75 @@ func TestDepthFind(t *testing.T) {
 	e := top.Find(p.Element(atom.Span))
 	if v, _ := e.Attr().ID(); v != "inner" {
 		t.Errorf("expected to find inner element, got: id=`%v`", v)
+	}
+}
+
+func TestFindAllPrinted(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+
+	ff := top.FindAll(p.Element(atom.Span))
+
+	b := new(bytes.Buffer)
+	for f := range ff {
+		f.Write(b)
+		io.WriteString(b, "\n")
+	}
+
+	s := `<span class="foo">1st</span>` + "\n" +
+		`<span id="2" class="bar other" attr2="boom">2nd</span>` + "\n" +
+		`<span class="bar another">3rd</span>` + "\n" +
+		`<span class="xyz yet-another">inner</span>` + "\n"
+
+	if res := b.String(); res != s {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", res, s)
+	}
+}
+
+func TestFindAll(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+
+	ff := top.FindAll(p.Element(atom.Span)).Consume()
+
+	if len(ff) != 4 {
+		t.Errorf("got %d, exp %d", len(ff), 4)
+	}
+	for i, f := range ff {
+		if s, res := atom.Span, f.Node.DataAtom; res != s {
+			t.Errorf("ff[%d]: got `%s`, exp `%s`", i, res, s)
+		}
+	}
+	if s, res := "1st", ff[0].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+	if s, res := "2nd", ff[1].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+	if s, res := "3rd", ff[2].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+	if s, res := "inner", ff[3].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+
+	if e, e0 := ff[0].FindSibling(p.Element(atom.Span)), ff[1]; e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+	if e, e0 := ff[1].FindPrevSibling(p.Element(atom.Span)), ff[0]; e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+
+	if e, e0 := ff[1].FindSibling(p.Element(atom.Span)), ff[2]; e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+	if e, e0 := ff[2].FindPrevSibling(p.Element(atom.Span)), ff[1]; e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+}
+
+func TestFindAllEmpty(t *testing.T) {
+	ff := Finder{}.FindAll(p.Element(atom.Div)).Consume()
+	if ff != nil {
+		t.Errorf("expected empty slice, got: %v", ff)
 	}
 }
 

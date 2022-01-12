@@ -14,6 +14,8 @@ type Finder struct {
 	*html.Node
 }
 
+type FinderStream <-chan Finder
+
 func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
 }
@@ -42,6 +44,13 @@ func (f Finder) String() string {
 	var b bytes.Buffer
 	f.Write(&b)
 	return b.String()
+}
+
+func (ff FinderStream) Consume() (res []Finder) {
+	for f := range ff {
+		res = append(res, f)
+	}
+	return
 }
 
 func (f Finder) Parent() Finder {
@@ -119,6 +128,36 @@ func (f Finder) Find(pred pred.Predicate) (r Finder) {
 
 	walker(f.Node)
 	return
+}
+
+// FindAll performs depth-first traversal like Find, but returns
+// a stream of all found nodes, each wrapped in a Finder.
+// FinderStream is really a readonly channel.
+// Current node is included in the search.
+func (f Finder) FindAll(pred pred.Predicate) FinderStream {
+	ch := make(chan Finder)
+
+	if f.Node == nil {
+		close(ch)
+		return ch
+	}
+
+	var walker func(node *html.Node)
+
+	walker = func(node *html.Node) {
+		if pred(node) {
+			ch <- FinderFromNode(node)
+		}
+		for c := node.FirstChild; c != nil; c = c.NextSibling {
+			walker(c)
+		}
+	}
+
+	go func() {
+		walker(f.Node)
+		close(ch)
+	}()
+	return ch
 }
 
 // FindSibling performs flat find among node's next (right) siblings.
