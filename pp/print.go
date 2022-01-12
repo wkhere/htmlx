@@ -33,16 +33,14 @@ func (p Printer) Print(w io.Writer, top *html.Node) {
 		} else {
 			dataRepr = "`" + node.Data + "`"
 		}
-		if !(p.TrimEmptyAttr && len(node.Attr) == 0) {
-			attrRepr = ppAttr(node.Attr)
-		}
+		attrRepr = ppAttr(node.Attr)
 
 		io.WriteString(w, strings.Repeat(" ", i*2))
 		io.WriteString(w, "T:")
 		io.WriteString(w, nodeTypes[node.Type])
 		io.WriteString(w, " D:")
 		io.WriteString(w, dataRepr)
-		if attrRepr != "" {
+		if attrRepr != "" || !p.TrimEmptyAttr {
 			io.WriteString(w, " A:")
 			io.WriteString(w, attrRepr)
 		}
