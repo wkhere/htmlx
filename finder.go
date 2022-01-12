@@ -94,8 +94,9 @@ func (f Finder) InnerText() string {
 	return f1.Data
 }
 
-// Find performs universal depth-first find.
+// Find performs depth-first traversal looking for a node satisfying `pred`.
 // Includes current node in the search.
+// Stops at the first found node and returns it, wrapped in a new Finder.
 func (f Finder) Find(pred pred.Predicate) (r Finder) {
 	if f.Node == nil {
 		return
