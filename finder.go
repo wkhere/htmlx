@@ -86,6 +86,14 @@ func (f Finder) Attr() attr.List {
 	return f.Node.Attr
 }
 
+func (f Finder) InnerText() string {
+	f1 := f.Find(pred.IsText())
+	if f1.IsEmpty() {
+		return ""
+	}
+	return f1.Data
+}
+
 // Find performs universal depth-first find.
 // Includes current node in the search.
 func (f Finder) Find(pred pred.Predicate) (r Finder) {
