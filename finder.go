@@ -31,12 +31,16 @@ func (f Finder) IsEmpty() bool {
 	return f.Node == nil
 }
 
+func (f Finder) Write(w io.Writer) {
+	html.Render(w, f.Node)
+}
+
 func (f Finder) String() string {
 	if f.Node == nil {
 		return ""
 	}
 	var b bytes.Buffer
-	html.Render(&b, f.Node)
+	f.Write(&b)
 	return b.String()
 }
 
