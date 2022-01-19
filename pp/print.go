@@ -98,6 +98,8 @@ func ppSpaces(s string) string {
 			t = "LF"
 		case '\r':
 			t = "CR"
+		case '\t':
+			t = "TAB"
 		case ' ':
 			t = "SPC"
 		default:
@@ -113,7 +115,7 @@ func ppSpaces(s string) string {
 	r := a[:1]
 	i := 0
 	for _, tok := range a[1:] {
-		if r[i].val == tok.val {
+		if r[i].val == tok.val && tok.val != "WS" {
 			r[i].cnt++
 		} else {
 			r = append(r, tok)
