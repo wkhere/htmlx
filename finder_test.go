@@ -18,22 +18,23 @@ func TestEmpty(t *testing.T) {
 	var empty Finder
 
 	if !empty.IsEmpty() {
-		t.Errorf("expected finder to be empty")
-	}
-	if empty.Find(p.ID("whatever")) != empty {
-		t.Errorf("expected empty.Find to return also empty finder")
-	}
-	if empty.FindSibling(p.ID("whatever")) != empty {
-		t.Errorf("expected empty.FindSibling to return also empty finder")
-	}
-	if empty.FirstChild() != empty {
-		t.Errorf("expected empty.FirstChild to return also empty finder")
-	}
-	if empty.NextSibling() != empty {
-		t.Errorf("expected empty.NextSibling to return also empty finder")
+		t.Errorf("expected empty finder to be, well, empty")
 	}
 	if empty.String() != "" {
 		t.Errorf("expected empty.String to return empty string")
+	}
+	if empty.FirstChild() != empty {
+		t.Errorf("expected empty.FirstChild to return empty finder")
+	}
+	if empty.NextSibling() != empty {
+		t.Errorf("expected empty.NextSibling to return empty finder")
+	}
+
+	if empty.Find(p.True()) != empty {
+		t.Errorf("expected empty.Find to return empty finder")
+	}
+	if empty.FindSibling(p.True()) != empty {
+		t.Errorf("expected empty.FindSibling to return empty finder")
 	}
 }
 
