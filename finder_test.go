@@ -39,6 +39,9 @@ func TestEmpty(t *testing.T) {
 	if empty.FindAll(p.True()).Consume() != nil {
 		t.Errorf("expected empty.FindAll to return empty stream")
 	}
+	if empty.FindSiblings(p.True()).Consume() != nil {
+		t.Errorf("expected empty.FindSiblings to return empty stream")
+	}
 }
 
 func TestFromNode(t *testing.T) {
@@ -214,6 +217,36 @@ func TestFindAll(t *testing.T) {
 
 	if e, e0 := ff[3].Parent(), ff[2].FindSibling(p.Element(atom.Div)); e != e0 {
 		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+}
+
+func TestFindSiblings(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+	e0 := top.Find(p.Element(atom.Span))
+
+	ff := e0.FindSiblings(p.Element(atom.Span)).Consume()
+
+	if len(ff) != 2 {
+		t.Errorf("got %d, exp %d", len(ff), 2)
+	}
+	for i, f := range ff {
+		if s, res := atom.Span, f.Node.DataAtom; res != s {
+			t.Errorf("ff[%d]: got `%s`, exp `%s`", i, res, s)
+		}
+	}
+	if s, res := "2nd", ff[0].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+	if s, res := "3rd", ff[1].InnerText(); res != s {
+		t.Errorf("got `%s`, exp `%s`", res, s)
+	}
+
+	if e := ff[0].FindPrevSibling(p.Element(atom.Span)); e != e0 {
+		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
+	}
+
+	if p := ff[1].FindSiblings(p.Element(atom.Span)).Consume(); p != nil {
+		t.Errorf("mismatch:\ngot:\n%v\nexp: nil", p)
 	}
 }
 

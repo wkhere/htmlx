@@ -175,6 +175,25 @@ func (f Finder) FindSibling(pred pred.Predicate) (r Finder) {
 	return
 }
 
+func (f Finder) FindSiblings(pred pred.Predicate) FinderStream {
+	ch := make(chan Finder)
+
+	if f.Node == nil {
+		close(ch)
+		return ch
+	}
+
+	go func() {
+		for c := f.Node.NextSibling; c != nil; c = c.NextSibling {
+			if pred(c) {
+				ch <- Finder{c}
+			}
+		}
+		close(ch)
+	}()
+	return ch
+}
+
 // FindPrevSibling performs flat find among node's previous (left) siblings.
 // No recursion. Omits current node, starts from a first such sibling.
 func (f Finder) FindPrevSibling(pred pred.Predicate) (r Finder) {
