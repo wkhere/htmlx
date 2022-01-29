@@ -36,6 +36,9 @@ func TestEmpty(t *testing.T) {
 	if empty.FindSibling(p.True()) != empty {
 		t.Errorf("expected empty.FindSibling to return empty finder")
 	}
+	if empty.FindAll(p.True()).Consume() != nil {
+		t.Errorf("expected empty.FindAll to return empty stream")
+	}
 }
 
 func TestFromNode(t *testing.T) {
@@ -211,13 +214,6 @@ func TestFindAll(t *testing.T) {
 
 	if e, e0 := ff[3].Parent(), ff[2].FindSibling(p.Element(atom.Div)); e != e0 {
 		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
-	}
-}
-
-func TestFindAllEmpty(t *testing.T) {
-	ff := Finder{}.FindAll(p.Element(atom.Div)).Consume()
-	if ff != nil {
-		t.Errorf("expected empty slice, got: %v", ff)
 	}
 }
 
