@@ -46,7 +46,7 @@ func (f Finder) String() string {
 	return b.String()
 }
 
-func (ff FinderStream) Consume() (res []Finder) {
+func (ff FinderStream) Collect() (res []Finder) {
 	for f := range ff {
 		res = append(res, f)
 	}

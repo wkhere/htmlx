@@ -36,10 +36,10 @@ func TestEmpty(t *testing.T) {
 	if empty.FindSibling(p.True()) != empty {
 		t.Errorf("expected empty.FindSibling to return empty finder")
 	}
-	if empty.FindAll(p.True()).Consume() != nil {
+	if empty.FindAll(p.True()).Collect() != nil {
 		t.Errorf("expected empty.FindAll to return empty stream")
 	}
-	if empty.FindSiblings(p.True()).Consume() != nil {
+	if empty.FindSiblings(p.True()).Collect() != nil {
 		t.Errorf("expected empty.FindSiblings to return empty stream")
 	}
 }
@@ -178,7 +178,7 @@ func TestFindAllPrinted(t *testing.T) {
 func TestFindAll(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 
-	ff := top.FindAll(p.Element(atom.Span)).Consume()
+	ff := top.FindAll(p.Element(atom.Span)).Collect()
 
 	if len(ff) != 4 {
 		t.Errorf("got %d, exp %d", len(ff), 4)
@@ -224,7 +224,7 @@ func TestFindSiblings(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 	e0 := top.Find(p.Element(atom.Span))
 
-	ff := e0.FindSiblings(p.Element(atom.Span)).Consume()
+	ff := e0.FindSiblings(p.Element(atom.Span)).Collect()
 
 	if len(ff) != 2 {
 		t.Errorf("got %d, exp %d", len(ff), 2)
@@ -245,7 +245,7 @@ func TestFindSiblings(t *testing.T) {
 		t.Errorf("mismatch:\ngot:\n%v\nexp:\n%v", e, e0)
 	}
 
-	if p := ff[1].FindSiblings(p.Element(atom.Span)).Consume(); p != nil {
+	if p := ff[1].FindSiblings(p.Element(atom.Span)).Collect(); p != nil {
 		t.Errorf("mismatch:\ngot:\n%v\nexp: nil", p)
 	}
 }
