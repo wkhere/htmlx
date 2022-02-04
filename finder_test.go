@@ -225,6 +225,7 @@ func TestFindAll(t *testing.T) {
 
 func TestFinderStreamSelectors(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
+
 	t.Run("First", func(t *testing.T) {
 		t.Parallel()
 		ff := top.FindAll(p.Element(atom.Span))
@@ -237,6 +238,7 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("got `%s`, exp `%s`", res, s)
 		}
 	})
+
 	t.Run("Last", func(t *testing.T) {
 		t.Parallel()
 		ff := top.FindAll(p.Element(atom.Span))
@@ -251,6 +253,7 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("expected FinderStream.Last then Last to be empty")
 		}
 	})
+
 	t.Run("Select", func(t *testing.T) {
 		t.Parallel()
 		ff := top.FindAll(p.Element(atom.Span))
