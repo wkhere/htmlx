@@ -270,6 +270,28 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("expected empty finder, got:\n%v", e3)
 		}
 	})
+
+	t.Run("Filter", func(t *testing.T) {
+		t.Parallel()
+		ff := top.FindAll(p.Element(atom.Span))
+		r := regexp.MustCompile("another$")
+		ff2 := ff.Filter(p.ClassCond(r.MatchString))
+		ee := ff2.Collect()
+		if len(ee) != 2 {
+			t.Errorf("got %d, exp %d", len(ee), 2)
+		}
+		for i, f := range ee {
+			if s, res := atom.Span, f.Node.DataAtom; res != s {
+				t.Errorf("ee[%d]: got `%s`, exp `%s`", i, res, s)
+			}
+		}
+		if s, res := "3rd", ee[0].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		if s, res := "inner", ee[1].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+	})
 }
 
 func TestFindSiblings(t *testing.T) {

@@ -72,6 +72,19 @@ func (ff FinderStream) Select(p pred.Predicate) Finder {
 	return Finder{}
 }
 
+func (ff FinderStream) Filter(p pred.Predicate) FinderStream {
+	ff2 := make(chan Finder)
+	go func() {
+		for f := range ff {
+			if p(f.Node) {
+				ff2 <- f
+			}
+		}
+		close(ff2)
+	}()
+	return ff2
+}
+
 func (f Finder) Parent() Finder {
 	if f.Node == nil {
 		return f
