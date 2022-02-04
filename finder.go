@@ -227,3 +227,22 @@ func (f Finder) FindPrevSibling(pred pred.Predicate) (r Finder) {
 	}
 	return
 }
+
+func (f Finder) FindPrevSiblings(pred pred.Predicate) FinderStream {
+	ch := make(chan Finder)
+
+	if f.Node == nil {
+		close(ch)
+		return ch
+	}
+
+	go func() {
+		for c := f.Node.PrevSibling; c != nil; c = c.PrevSibling {
+			if pred(c) {
+				ch <- Finder{c}
+			}
+		}
+		close(ch)
+	}()
+	return ch
+}
