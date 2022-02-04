@@ -53,6 +53,25 @@ func (ff FinderStream) Collect() (res []Finder) {
 	return
 }
 
+func (ff FinderStream) First() Finder {
+	return <-ff
+}
+
+func (ff FinderStream) Last() (f Finder) {
+	for f = range ff {
+	}
+	return
+}
+
+func (ff FinderStream) Select(p pred.Predicate) Finder {
+	for f := range ff {
+		if p(f.Node) {
+			return f
+		}
+	}
+	return Finder{}
+}
+
 func (f Finder) Parent() Finder {
 	if f.Node == nil {
 		return f

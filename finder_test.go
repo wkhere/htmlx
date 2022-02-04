@@ -220,6 +220,52 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
+func TestFinderStreamSelectors(t *testing.T) {
+	top, _ := FinderFromData(testdata("simple.html"))
+	t.Run("First", func(t *testing.T) {
+		t.Parallel()
+		ff := top.FindAll(p.Element(atom.Span))
+		e := ff.First()
+		if s, res := "1st", e.InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		e2 := ff.First()
+		if s, res := "2nd", e2.InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+	})
+	t.Run("Last", func(t *testing.T) {
+		t.Parallel()
+		ff := top.FindAll(p.Element(atom.Span))
+		e := ff.Last()
+		if s, res := "inner", e.InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		if e2 := ff.First(); !e2.IsEmpty() {
+			t.Errorf("expected FinderStream.Last then First to be empty")
+		}
+		if e2 := ff.Last(); !e2.IsEmpty() {
+			t.Errorf("expected FinderStream.Last then Last to be empty")
+		}
+	})
+	t.Run("Select", func(t *testing.T) {
+		t.Parallel()
+		ff := top.FindAll(p.Element(atom.Span))
+		e := ff.Select(p.ID("2"))
+		if s, res := "2nd", e.InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		e2 := ff.First()
+		if s, res := "3rd", e2.InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		e3 := ff.Select(p.ID("nonexistent"))
+		if !e3.IsEmpty() {
+			t.Errorf("expected empty finder, got:\n%v", e3)
+		}
+	})
+}
+
 func TestFindSiblings(t *testing.T) {
 	top, _ := FinderFromData(testdata("simple.html"))
 	e0 := top.Find(p.Element(atom.Span))
