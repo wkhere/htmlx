@@ -3,6 +3,7 @@ package htmlx
 import (
 	"bytes"
 	"io"
+	"sync"
 
 	"golang.org/x/net/html"
 
@@ -15,6 +16,10 @@ type Finder struct {
 }
 
 type FinderStream <-chan Finder
+
+var outpool = sync.Pool{
+	New: func() interface{} { return new(bytes.Buffer) },
+}
 
 func FinderFromNode(h *html.Node) Finder {
 	return Finder{h}
@@ -41,8 +46,12 @@ func (f Finder) String() string {
 	if f.Node == nil {
 		return ""
 	}
-	var b bytes.Buffer
-	f.Write(&b)
+	b := outpool.Get().(*bytes.Buffer)
+	defer func() {
+		b.Reset()
+		outpool.Put(b)
+	}()
+	f.Write(b)
 	return b.String()
 }
 
