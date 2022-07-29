@@ -48,7 +48,10 @@ func TestEmpty(t *testing.T) {
 }
 
 func TestFromNode(t *testing.T) {
-	node, _ := html.Parse(testdata("simple.html"))
+	f := testdata("simple.html")
+	node, _ := html.Parse(f)
+	f.Close()
+
 	top := FinderFromNode(node)
 	div0 := top.Find(p.Element(atom.Div))
 
@@ -68,7 +71,9 @@ func TestFromString(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
 
 	id1 := top.Find(p.ID("1"))
 
@@ -158,7 +163,9 @@ func TestDepthFind(t *testing.T) {
 }
 
 func TestFindAllPrinted(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
 
 	ff := top.FindAll(p.Element(atom.Span))
 
@@ -179,7 +186,9 @@ func TestFindAllPrinted(t *testing.T) {
 }
 
 func TestFindAll(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
 
 	ff := top.FindAll(p.Element(atom.Span)).Collect()
 
@@ -224,7 +233,9 @@ func TestFindAll(t *testing.T) {
 }
 
 func TestFinderStreamSelectors(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
 
 	t.Run("First", func(t *testing.T) {
 		t.Parallel()
@@ -295,7 +306,10 @@ func TestFinderStreamSelectors(t *testing.T) {
 }
 
 func TestFindSiblings(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
 	e0 := top.Find(p.Element(atom.Span))
 
 	ff := e0.FindSiblings(p.Element(atom.Span)).Collect()
@@ -325,7 +339,10 @@ func TestFindSiblings(t *testing.T) {
 }
 
 func TestFindPrevSiblings(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
 	e0 := top.Find(p.Element(atom.Span)).
 		FindSiblings(p.Element(atom.Span)).Last()
 
@@ -356,7 +373,9 @@ func TestFindPrevSiblings(t *testing.T) {
 }
 
 func TestAttrShortcuts(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
 
 	e := top.Find(p.ID("2"))
 
@@ -400,7 +419,10 @@ func TestAttrShortcuts(t *testing.T) {
 }
 
 func TestPredShortcuts(t *testing.T) {
-	top, _ := FinderFromData(testdata("simple.html"))
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
 	var r *regexp.Regexp
 	var e Finder
 
@@ -480,9 +502,12 @@ func BenchmarkBasic(b *testing.B) {
 }
 
 func BenchmarkGoV(b *testing.B) {
-	f, _ := FinderFromData(testdata("gatesofvienna.html"))
+	f := testdata("gatesofvienna.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
 	for n := 0; n < b.N; n++ {
-		f.Find(p.Class("html-end-of-file"))
+		top.Find(p.Class("html-end-of-file"))
 	}
 }
 
