@@ -26,6 +26,7 @@ func FinderFromData(r io.Reader) (Finder, error) {
 }
 
 func FinderFromString(s string) (Finder, error) {
+	// todo: check if strings.Reader is faster -> bigger benchmarks
 	return FinderFromData(bytes.NewBufferString(s))
 }
 
@@ -41,6 +42,7 @@ func (f Finder) String() string {
 	if f.Node == nil {
 		return ""
 	}
+	// todo: check if strings.Builder is faster -> bigger benchmarks
 	var b bytes.Buffer
 	f.Write(&b)
 	return b.String()
