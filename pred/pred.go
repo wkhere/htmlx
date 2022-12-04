@@ -13,6 +13,10 @@ func True() Predicate {
 	return func(*html.Node) bool { return true }
 }
 
+func AnyElement() Predicate {
+	return func(h *html.Node) bool { return h.Type == html.ElementNode }
+}
+
 func Element(element atom.Atom) Predicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.ElementNode && h.DataAtom == element
@@ -81,6 +85,10 @@ func InnerTextCond(p func(string) bool) Predicate {
 			h.FirstChild.Type == html.TextNode &&
 			p(h.FirstChild.Data)
 	}
+}
+
+func AnyText() Predicate {
+	return func(h *html.Node) bool { return h.Type == html.TextNode }
 }
 
 func Text(s string) Predicate {
