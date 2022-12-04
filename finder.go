@@ -34,8 +34,8 @@ func (f Finder) IsEmpty() bool {
 	return f.Node == nil
 }
 
-func (f Finder) Write(w io.Writer) {
-	html.Render(w, f.Node)
+func (f Finder) Write(w io.Writer) error {
+	return html.Render(w, f.Node)
 }
 
 func (f Finder) String() string {
