@@ -4,7 +4,7 @@ go:
 	go install	./...
 
 bench:
-	go test -bench=$(sel) -count $(cnt) -benchmem .
+	go test -bench=$(sel) -count $(cnt) -benchmem
 sel=.
 cnt=5
 

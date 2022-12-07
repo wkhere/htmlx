@@ -554,6 +554,7 @@ func BenchmarkBasic(b *testing.B) {
 			</div>
 		</div>
 	`)
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		id1 := f.Find(p.ID("id1"))
 		id1.Find(p.Attr("class", "baz"))
@@ -565,6 +566,7 @@ func BenchmarkGoV(b *testing.B) {
 	top, _ := FinderFromData(f)
 	f.Close()
 
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		top.Find(p.Class("html-end-of-file"))
 	}
