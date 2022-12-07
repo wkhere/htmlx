@@ -162,6 +162,34 @@ func TestDepthFind(t *testing.T) {
 	}
 }
 
+func TestFindElementWith1Pred(t *testing.T) {
+	top, _ := FinderFromString(`
+		<div id="1">
+		  <span id="inner"></span>
+		</div>
+		<span id="2"></span>
+	`)
+
+	e := top.Find(p.Element(atom.Span, p.ID("inner")))
+	if v, _ := e.Attr().ID(); v != "inner" {
+		t.Errorf("expected to find inner element, got: id=`%v`", v)
+	}
+}
+
+func TestFindElementWith2Preds(t *testing.T) {
+	top, _ := FinderFromString(`
+		<div id="1">
+		  <span id="inner" class="xyz foo"></span>
+		</div>
+		<span id="2"></span>
+	`)
+
+	e := top.Find(p.Element(atom.Span, p.Class("foo"), p.ID("inner")))
+	if v, _ := e.Attr().ID(); v != "inner" {
+		t.Errorf("expected to find inner element, got: id=`%v`", v)
+	}
+}
+
 func TestFindAllPrinted(t *testing.T) {
 	f := testdata("simple.html")
 	top, _ := FinderFromData(f)

@@ -17,9 +17,10 @@ func AnyElement() Predicate {
 	return func(h *html.Node) bool { return h.Type == html.ElementNode }
 }
 
-func Element(element atom.Atom) Predicate {
+func Element(element atom.Atom, pp ...Predicate) Predicate {
 	return func(h *html.Node) bool {
-		return h.Type == html.ElementNode && h.DataAtom == element
+		return h.Type == html.ElementNode && h.DataAtom == element &&
+			all(pp, h)
 	}
 }
 
@@ -91,9 +92,9 @@ func AnyText() Predicate {
 	return func(h *html.Node) bool { return h.Type == html.TextNode }
 }
 
-func Text(s string) Predicate {
+func Text(s string, pp ...Predicate) Predicate {
 	return func(h *html.Node) bool {
-		return h.Type == html.TextNode && h.Data == s
+		return h.Type == html.TextNode && h.Data == s && all(pp, h)
 	}
 }
 
@@ -107,4 +108,13 @@ func IsText() Predicate {
 	return func(h *html.Node) bool {
 		return h.Type == html.TextNode
 	}
+}
+
+func all(pp []Predicate, h *html.Node) bool {
+	for _, p := range pp {
+		if !p(h) {
+			return false
+		}
+	}
+	return true
 }
