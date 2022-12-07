@@ -400,6 +400,37 @@ func TestFindPrevSiblings(t *testing.T) {
 	}
 }
 
+func TestFindWithSiblings(t *testing.T) {
+	f := testdata("simple.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
+	fc, ok := top.FindWithSiblings(p.Element(atom.Span))
+	if !ok {
+		t.Errorf("ok: got %v, exp %v", ok, true)
+	}
+
+	ff := fc.Collect()
+
+	if len(ff) != 3 {
+		t.Errorf("got %d, exp %d", len(ff), 3)
+	}
+	for i, f := range ff {
+		if s, res := atom.Span, f.Node.DataAtom; res != s {
+			t.Errorf("ff[%d]: got `%s`, exp `%s`", i, res, s)
+		}
+	}
+
+	expText := []string{"1st", "2nd", "3rd"}
+
+	for i, s := range expText {
+		if res := ff[i].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+	}
+
+}
+
 func TestAttrShortcuts(t *testing.T) {
 	f := testdata("simple.html")
 	top, _ := FinderFromData(f)
