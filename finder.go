@@ -130,6 +130,7 @@ func (f Finder) Attr() attr.List {
 }
 
 func (f Finder) InnerText() string {
+	// fixme: element can have many text children
 	f1 := f.Find(pred.IsText())
 	if f1.IsEmpty() {
 		return ""
