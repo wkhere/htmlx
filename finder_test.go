@@ -572,6 +572,18 @@ func BenchmarkGoV(b *testing.B) {
 	}
 }
 
+func BenchmarkTRSiblings(b *testing.B) {
+	f := testdata("gatesofvienna.html")
+	top, _ := FinderFromData(f)
+	f.Close()
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		trs, _ := top.FindWithSiblings(p.Element(atom.Tr))
+		trs.Collect()
+	}
+}
+
 func testdata(filename string) (f *os.File) {
 	f, err := os.Open(path.Join("testdata", filename))
 	if err != nil {
