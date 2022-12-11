@@ -18,39 +18,39 @@ func TestEmpty(t *testing.T) {
 	var empty Finder
 
 	if !empty.IsEmpty() {
-		t.Errorf("expected empty finder to be, well, empty")
+		t.Error("expected empty finder to be, well, empty")
 	}
 	if empty.String() != "" {
-		t.Errorf("expected empty.String to return empty string")
+		t.Error("expected empty.String to return empty string")
 	}
 	if empty.FirstChild() != empty {
-		t.Errorf("expected empty.FirstChild to return empty finder")
+		t.Error("expected empty.FirstChild to return empty finder")
 	}
 	if empty.NextSibling() != empty {
-		t.Errorf("expected empty.NextSibling to return empty finder")
+		t.Error("expected empty.NextSibling to return empty finder")
 	}
 
 	if empty.Find(p.True()) != empty {
-		t.Errorf("expected empty.Find to return empty finder")
+		t.Error("expected empty.Find to return empty finder")
 	}
 	if empty.FindSibling(p.True()) != empty {
-		t.Errorf("expected empty.FindSibling to return empty finder")
+		t.Error("expected empty.FindSibling to return empty finder")
 	}
 	if empty.FindAll(p.True()).Collect() != nil {
-		t.Errorf("expected empty.FindAll to return empty stream")
+		t.Error("expected empty.FindAll to return empty stream")
 	}
 	if empty.FindSiblings(p.True()).Collect() != nil {
-		t.Errorf("expected empty.FindSiblings to return empty stream")
+		t.Error("expected empty.FindSiblings to return empty stream")
 	}
 	if empty.FindPrevSiblings(p.True()).Collect() != nil {
-		t.Errorf("expected empty.FindSiblings to return empty stream")
+		t.Error("expected empty.FindSiblings to return empty stream")
 	}
 
 	if ok := empty.Attr().Exists("href"); ok {
-		t.Errorf("expected empty finder to not have href attr")
+		t.Error("expected empty finder to not have href attr")
 	}
 	if _, ok := empty.Attr().Val("href"); ok {
-		t.Errorf("expected empty finder to not return href attr")
+		t.Error("expected empty finder to not return href attr")
 	}
 }
 
@@ -81,7 +81,7 @@ func TestFromNode(t *testing.T) {
 	div0 := top.Find(p.Element(atom.Div))
 
 	if div0.Find(p.Class("bar")) != div0.Find(p.Class("other")) {
-		t.Errorf("mismatch")
+		t.Error("mismatch")
 	}
 }
 
@@ -91,7 +91,7 @@ func TestFromString(t *testing.T) {
 	div := top.Find(p.Element(atom.Div))
 
 	if res := top.Find(p.ID("1")); res != div {
-		t.Errorf("mismatch")
+		t.Error("mismatch")
 	}
 }
 
@@ -311,10 +311,10 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("got `%s`, exp `%s`", res, s)
 		}
 		if e2 := ff.First(); !e2.IsEmpty() {
-			t.Errorf("expected FinderStream.Last then First to be empty")
+			t.Error("expected FinderStream.Last then First to be empty")
 		}
 		if e2 := ff.Last(); !e2.IsEmpty() {
-			t.Errorf("expected FinderStream.Last then Last to be empty")
+			t.Error("expected FinderStream.Last then Last to be empty")
 		}
 	})
 
@@ -512,37 +512,37 @@ func TestPredShortcuts(t *testing.T) {
 
 	e = top.Find(p.InnerText("2nd"))
 	if !e.Attr().HasID("2") {
-		t.Errorf(`failed to find inner text "2nd"`)
+		t.Error(`failed to find inner text "2nd"`)
 	}
 
 	r = regexp.MustCompile("3rd")
 	e = top.Find(p.InnerTextCond(r.MatchString))
 	if !e.Attr().HasClass("bar") {
-		t.Errorf(`failed to find inner text r"3rd"`)
+		t.Error(`failed to find inner text r"3rd"`)
 	}
 
 	r = regexp.MustCompile("[oO]ther")
 	e = top.Find(p.ClassCond(r.MatchString))
 	if !e.Attr().HasID("2") {
-		t.Errorf(`failed to find class r"[oO]ther"`)
+		t.Error(`failed to find class r"[oO]ther"`)
 	}
 
 	r = regexp.MustCompile("2")
 	e = top.Find(p.IDCond(r.MatchString))
 	if !e.Attr().HasID("2") {
-		t.Errorf(`failed to find ID r"2"`)
+		t.Error(`failed to find ID r"2"`)
 	}
 
 	r = regexp.MustCompile("bo.m")
 	e = top.Find(p.AttrCond("attr2", r.MatchString))
 	if !e.Attr().HasID("2") {
-		t.Errorf(`failed to find attr in "attr2" by r"bo.m"`)
+		t.Error(`failed to find attr in "attr2" by r"bo.m"`)
 	}
 
 	r = regexp.MustCompile("xyz")
 	e = top.Find(p.AttrWordCond("class", r.MatchString))
 	if !e.Attr().HasClass("xyz") {
-		t.Errorf(`failed to find attr word in "class" by r"xyz"`)
+		t.Error(`failed to find attr word in "class" by r"xyz"`)
 	}
 }
 
