@@ -48,6 +48,21 @@ func (f Finder) String() string {
 	return b.String()
 }
 
+func (f Finder) StreamSelf() FinderStream {
+	var ch chan Finder
+
+	if f.Node == nil {
+		ch = make(chan Finder)
+		close(ch)
+		return ch
+	}
+
+	ch = make(chan Finder, 1)
+	ch <- f
+	close(ch)
+	return ch
+}
+
 func (ff FinderStream) Collect() (res []Finder) {
 	for f := range ff {
 		res = append(res, f)

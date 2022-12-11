@@ -52,6 +52,13 @@ func TestEmpty(t *testing.T) {
 	if _, ok := empty.Attr().Val("href"); ok {
 		t.Error("expected empty finder to not return href attr")
 	}
+
+	if r := empty.StreamSelf().First(); !r.IsEmpty() {
+		t.Error("expected empty finder streamed and extracted to be empty")
+	}
+	if rr := empty.StreamSelf().Collect(); len(rr) > 0 {
+		t.Error("expected empty finder streamed and collected to be empty")
+	}
 }
 
 func TestEmptyFinderAttr(t *testing.T) {
@@ -356,6 +363,16 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("got `%s`, exp `%s`", res, s)
 		}
 	})
+}
+
+func TestStreamSelf(t *testing.T) {
+	top, _ := FinderFromString(`<span id="1">`)
+
+	e := top.Find(p.ID("1"))
+
+	if e2 := e.StreamSelf().First(); e2 != e {
+		t.Error("expected finder streamed and extracted to be the same")
+	}
 }
 
 func TestFindSiblings(t *testing.T) {
