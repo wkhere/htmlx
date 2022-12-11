@@ -363,6 +363,50 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("got `%s`, exp `%s`", res, s)
 		}
 	})
+
+	t.Run("TakeN", func(t *testing.T) {
+		t.Parallel()
+
+		ff := top.FindAll(p.Element(atom.Span))
+		ee := ff.TakeN(2).Collect()
+
+		if len(ee) != 2 {
+			t.Errorf("got %d, exp %d", len(ee), 2)
+		}
+		for i, f := range ee {
+			if s, res := atom.Span, f.Node.DataAtom; res != s {
+				t.Errorf("ee[%d]: got `%s`, exp `%s`", i, res, s)
+			}
+		}
+		if s, res := "1st", ee[0].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		if s, res := "2nd", ee[1].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+	})
+
+	t.Run("DropN", func(t *testing.T) {
+		t.Parallel()
+
+		ff := top.FindAll(p.Element(atom.Span))
+		ee := ff.DropN(2).Collect()
+
+		if len(ee) != 2 {
+			t.Errorf("got %d, exp %d", len(ee), 2)
+		}
+		for i, f := range ee {
+			if s, res := atom.Span, f.Node.DataAtom; res != s {
+				t.Errorf("ee[%d]: got `%s`, exp `%s`", i, res, s)
+			}
+		}
+		if s, res := "3rd", ee[0].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+		if s, res := "inner", ee[1].InnerText(); res != s {
+			t.Errorf("got `%s`, exp `%s`", res, s)
+		}
+	})
 }
 
 func TestStreamSelf(t *testing.T) {

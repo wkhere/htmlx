@@ -102,6 +102,39 @@ func (ff FinderStream) Filter(p pred.Predicate) FinderStream {
 	return ff2
 }
 
+func (ff FinderStream) TakeN(n int) FinderStream {
+	ff2 := make(chan Finder)
+	go func() {
+		i := 0
+		for f := range ff {
+			if i >= n {
+				break
+			}
+			ff2 <- f
+			i++
+		}
+		close(ff2)
+	}()
+	return ff2
+}
+
+func (ff FinderStream) DropN(n int) FinderStream {
+	ff2 := make(chan Finder)
+	go func() {
+		i := 0
+		for f := range ff {
+			if i < n {
+				i++
+				continue
+			}
+			ff2 <- f
+
+		}
+		close(ff2)
+	}()
+	return ff2
+}
+
 func (f Finder) Parent() Finder {
 	if f.Node == nil {
 		return f
