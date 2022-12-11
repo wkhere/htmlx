@@ -324,14 +324,14 @@ func (f Finder) FindPrevSiblings(pred pred.Predicate) FinderStream {
 // of nodes satisfying given predicate.
 // Then it continues flat find of all the siblings satisfying the predicate.
 // All results are pushed into the returted stream of Finders.
-func (f Finder) FindWithSiblings(pred pred.Predicate) (FinderStream, bool) {
+func (f Finder) FindWithSiblings(pred pred.Predicate) FinderStream {
 	ch := make(chan Finder, 1)
 
 	f = f.Find(pred)
 
 	if f.Node == nil {
 		close(ch)
-		return ch, false
+		return ch
 	}
 
 	ch <- f
@@ -343,5 +343,5 @@ func (f Finder) FindWithSiblings(pred pred.Predicate) (FinderStream, bool) {
 		}
 		close(ch)
 	}()
-	return ch, true
+	return ch
 }

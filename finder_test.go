@@ -491,12 +491,7 @@ func TestFindWithSiblings(t *testing.T) {
 	top, _ := FinderFromData(f)
 	f.Close()
 
-	fc, ok := top.FindWithSiblings(p.Element(atom.Span))
-	if !ok {
-		t.Errorf("ok: got %v, exp %v", ok, true)
-	}
-
-	ff := fc.Collect()
+	ff := top.FindWithSiblings(p.Element(atom.Span)).Collect()
 
 	if len(ff) != 3 {
 		t.Errorf("got %d, exp %d", len(ff), 3)
@@ -647,7 +642,7 @@ func BenchmarkTRSiblings(b *testing.B) {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		trs, _ := top.FindWithSiblings(p.Element(atom.Tr))
+		trs := top.FindWithSiblings(p.Element(atom.Tr))
 		trs.Collect()
 	}
 }
