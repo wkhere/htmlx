@@ -45,6 +45,13 @@ func TestEmpty(t *testing.T) {
 	if empty.FindPrevSiblings(p.True()).Collect() != nil {
 		t.Errorf("expected empty.FindSiblings to return empty stream")
 	}
+
+	if ok := empty.Attr().Exists("href"); ok {
+		t.Errorf("expected empty finder to not have href attr")
+	}
+	if _, ok := empty.Attr().Val("href"); ok {
+		t.Errorf("expected empty finder to not return href attr")
+	}
 }
 
 func TestFromNode(t *testing.T) {
