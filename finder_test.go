@@ -429,7 +429,7 @@ func TestFindSiblings(t *testing.T) {
 	ff := e0.FindSiblings(p.Element(atom.Span)).Collect()
 
 	if len(ff) != 2 {
-		t.Errorf("got %d, exp %d", len(ff), 2)
+		t.Errorf("len: got %d, exp %d", len(ff), 2)
 	}
 	for i, f := range ff {
 		if s, res := atom.Span, f.Node.DataAtom; res != s {
