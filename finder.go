@@ -288,7 +288,6 @@ func (f Finder) FindWithSiblings(pred pred.Predicate) (FinderStream, bool) {
 
 	ch <- f
 	go func() {
-
 		for c := f.Node.NextSibling; c != nil; c = c.NextSibling {
 			if pred(c) {
 				ch <- Finder{c}
