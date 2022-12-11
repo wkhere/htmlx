@@ -54,6 +54,24 @@ func TestEmpty(t *testing.T) {
 	}
 }
 
+func TestEmptyFinderAttr(t *testing.T) {
+	f := Finder{}
+
+	tab := []bool{
+		func() bool { _, ok := f.Attr().ID(); return ok }(),
+		func() bool { _, ok := f.Attr().ClassList(); return ok }(),
+		f.Attr().Exists("any"),
+		f.Attr().HasID("any"),
+		f.Attr().HasClass("any"),
+	}
+
+	for i, tc := range tab {
+		if tc {
+			t.Errorf("tc[%d] should be false", i)
+		}
+	}
+}
+
 func TestFromNode(t *testing.T) {
 	f := testdata("simple.html")
 	node, _ := html.Parse(f)
@@ -525,24 +543,6 @@ func TestPredShortcuts(t *testing.T) {
 	e = top.Find(p.AttrWordCond("class", r.MatchString))
 	if !e.Attr().HasClass("xyz") {
 		t.Errorf(`failed to find attr word in "class" by r"xyz"`)
-	}
-}
-
-func TestEmptyFinderAttr(t *testing.T) {
-	f := Finder{}
-
-	tab := []bool{
-		func() bool { _, ok := f.Attr().ID(); return ok }(),
-		func() bool { _, ok := f.Attr().ClassList(); return ok }(),
-		f.Attr().Exists("any"),
-		f.Attr().HasID("any"),
-		f.Attr().HasClass("any"),
-	}
-
-	for i, tc := range tab {
-		if tc {
-			t.Errorf("tc[%d] should be false", i)
-		}
 	}
 }
 
