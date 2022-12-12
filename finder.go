@@ -48,6 +48,11 @@ func (f Finder) String() string {
 	return b.String()
 }
 
+func (f Finder) Copy() Finder {
+	node2 := *f.Node
+	return Finder{&node2}
+}
+
 func (f Finder) StreamSelf() FinderStream {
 	var ch chan Finder
 
