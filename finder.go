@@ -75,6 +75,17 @@ func (ff FinderStream) Collect() (res []Finder) {
 	return
 }
 
+func Inject(a []Finder) FinderStream {
+	ff := make(chan Finder)
+	go func() {
+		for _, f := range a {
+			ff <- f
+		}
+		close(ff)
+	}()
+	return ff
+}
+
 func (ff FinderStream) First() Finder {
 	return <-ff
 }
