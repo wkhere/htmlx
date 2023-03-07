@@ -1,14 +1,5 @@
 Finder family:
-	+ monad-style Finder
-	+ tests for nil guards
-	+ FindSibling (non-recursive)
-	- FindInSiblings (recursive)
-	+ FindByClass
-	- why it got slower
-	- concurrency?
-
-	possible optimization: type Finder *html.Node,
-	this is against the spec (receiver base type can't be pointer)
+	- direct Children
 
 	think of some vm for searching!
 	then use a language to describe a search
