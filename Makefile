@@ -10,6 +10,6 @@ cnt=5
 
 cover:
 	go test -coverprofile=cov
-	go tool cover -html cov
+	go tool cover -html=cov -o cov.html && browse cov.html
 
 .PHONY: go benchmark cover
