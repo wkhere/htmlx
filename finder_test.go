@@ -24,8 +24,20 @@ func TestEmpty(t *testing.T) {
 	if empty.String() != "" {
 		t.Error("expected empty.String to return empty string")
 	}
+	if empty.InnerText() != "" {
+		t.Error("expected empty.InnerText to return empty string")
+	}
+	if empty.Parent() != empty {
+		t.Error("expected empty.Parent to return empty finder")
+	}
 	if empty.FirstChild() != empty {
 		t.Error("expected empty.FirstChild to return empty finder")
+	}
+	if empty.LastChild() != empty {
+		t.Error("expected empty.LastChild to return empty finder")
+	}
+	if empty.PrevSibling() != empty {
+		t.Error("expected empty.PrevSibling to return empty finder")
 	}
 	if empty.NextSibling() != empty {
 		t.Error("expected empty.NextSibling to return empty finder")
@@ -37,6 +49,9 @@ func TestEmpty(t *testing.T) {
 	if empty.FindSibling(p.True()) != empty {
 		t.Error("expected empty.FindSibling to return empty finder")
 	}
+	if empty.FindPrevSibling(p.True()) != empty {
+		t.Error("expected empty.FindPrevSibling to return empty finder")
+	}
 	if empty.FindAll(p.True()).Collect() != nil {
 		t.Error("expected empty.FindAll to return empty stream")
 	}
@@ -45,6 +60,9 @@ func TestEmpty(t *testing.T) {
 	}
 	if empty.FindPrevSiblings(p.True()).Collect() != nil {
 		t.Error("expected empty.FindSiblings to return empty stream")
+	}
+	if empty.FindWithSiblings(p.True()).Collect() != nil {
+		t.Error("expected empty.FindWithSiblings to return empty stream")
 	}
 
 	if ok := empty.Attr().Exists("href"); ok {
@@ -170,7 +188,12 @@ func TestFind(t *testing.T) {
 		id1.Find(p.Class("bad")),
 		id1.NextSibling().FindSibling(p.ID("any")),
 		id1.FirstChild().FindSibling(p.ID("bad")),
+		id1.LastChild().Find(p.ID("2")),
 		span1.FindSibling(p.Class("xyz")),
+		span1.FindSibling(p.Class("xyz")),
+		span1.FindPrevSibling(p.Element(atom.Span)),
+		spanInner.FindSibling(p.Element(atom.Span)),
+		spanInner.FindPrevSibling(p.Element(atom.Span)),
 		div4.Find(p.Class("another")),
 	}
 
@@ -420,6 +443,40 @@ func TestFinderStreamSelectors(t *testing.T) {
 			t.Errorf("got `%s`, exp `%s`", res, s)
 		}
 	})
+}
+
+func TestFamilySelectors(t *testing.T) {
+	file := testdata("simple.html")
+	top, _ := FinderFromData(file)
+	file.Close()
+
+	if !top.Parent().IsEmpty() {
+		t.Error("expected top.Parent to be empty")
+	}
+
+	f1 := top.Find(p.Element(atom.Span))
+	f0 := f1.Parent()
+	if id := "1"; !f0.Attr().HasID(id) {
+		t.Errorf("expected f1.Parent to have id=%s", id)
+	}
+
+	if f1.NextSibling().PrevSibling() != f1 {
+		t.Error("expected NextSibling.PrevSibling to be self")
+	}
+
+	var f Finder
+
+	for f = f1.FirstChild(); !f.NextSibling().IsEmpty(); f = f.NextSibling() {
+	}
+	if f != f1.LastChild() {
+		t.Error("expected loop of NextSibling to go from FirstChild to LastChild")
+	}
+
+	for f = f1.LastChild(); !f.PrevSibling().IsEmpty(); f = f.PrevSibling() {
+	}
+	if f != f1.FirstChild() {
+		t.Error("expected loop of PrevSibling to go from LastChild to FirstChild")
+	}
 }
 
 func TestStreamSelf(t *testing.T) {
