@@ -21,15 +21,15 @@ func TestStreamCombinators(t *testing.T) {
 		ff := top.FindWithSiblings(p.Element(atom.Li)).Join(AllText)
 		ee := ff.Collect()
 
-		if len(ee) != 5 {
-			t.Errorf("got %d, exp %d", len(ee), 5)
+		if n := 6; len(ee) != n {
+			t.Errorf("got %d, exp %d", len(ee), n)
 		}
 		for i, e := range ee {
 			if nt := e.Type; nt != html.TextNode {
 				t.Errorf("ee[%d] type: got %v, exp %v", i, nt, html.TextNode)
 			}
 		}
-		tab := []string{`1st`, `2nd`, `inner`, `3th`, `4th`}
+		tab := []string{`1st`, `2nd`, `inner`, `inner2`, `3th`, `4th`}
 		for i, data := range tab {
 			if res := strings.TrimSpace(ee[i].Data); res != data {
 				t.Errorf("ee[%d] data: got `%s`, exp `%s`", i, res, data)
@@ -48,8 +48,8 @@ func TestStreamCombinators(t *testing.T) {
 			)
 		ee := ff.Collect()
 
-		if len(ee) != 5 {
-			t.Errorf("got %d, exp %d", len(ee), 5)
+		if n := 6; len(ee) != n {
+			t.Errorf("got %d, exp %d", len(ee), n)
 		}
 		for i, e := range ee {
 			if nt := e.Type; nt != html.TextNode {
@@ -80,15 +80,15 @@ func TestStreamCombinators(t *testing.T) {
 		)
 		ee := ff.Collect()
 
-		if len(ee) != 4 {
-			t.Errorf("got %d, exp %d", len(ee), 4)
+		if n := 5; len(ee) != n {
+			t.Errorf("got %d, exp %d", len(ee), n)
 		}
 		for i, e := range ee {
 			if nt := e.Type; nt != html.TextNode {
 				t.Errorf("ee[%d] type: got %v, exp %v", i, nt, html.TextNode)
 			}
 		}
-		tab := []string{`1st`, `2nd`, `3th`, `4th`}
+		tab := []string{`1st`, `2nd`, `inner2`, `3th`, `4th`}
 		for i, data := range tab {
 			if res := strings.TrimSpace(ee[i].Data); res != data {
 				t.Errorf("ee[%d] data: got `%s`, exp `%s`", i, res, data)
