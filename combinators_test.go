@@ -40,12 +40,10 @@ func TestStreamCombinators(t *testing.T) {
 	t.Run("JoinMap", func(t *testing.T) {
 		t.Parallel()
 
-		ff := top.FindWithSiblings(p.Element(atom.Li)).Join(AllText).
-			Map(
-				func(x Finder) {
-					x.Data = "foo"
-				},
-			)
+		ff := top.FindWithSiblings(p.Element(atom.Li)).
+			Join(AllText).
+			Map(func(x Finder) { x.Data = "foo" })
+
 		ee := ff.Collect()
 
 		if n := 6; len(ee) != n {
