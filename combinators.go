@@ -59,8 +59,12 @@ func (ff FinderStream) Map(m MapFunc) FinderStream {
 func (ff FinderStream) Reduce(combine ReduceFunc) FinderStream {
 	ff2 := make(chan Finder)
 	go func() {
-		x := <-ff
+		x, ok := <-ff
+		if !ok {
+			goto end
+		}
 		ff2 <- x
+
 		for {
 			select {
 			case y, ok := <-ff:

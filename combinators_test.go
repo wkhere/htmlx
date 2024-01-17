@@ -94,3 +94,39 @@ func TestStreamCombinators(t *testing.T) {
 		}
 	})
 }
+
+func TestEmptyStreamCombinators(t *testing.T) {
+	var empty Finder
+
+	t.Run("Join", func(t *testing.T) {
+		t.Parallel()
+
+		ff := empty.StreamSelf().Join(Finder.StreamSelf)
+
+		if len(ff.Collect()) != 0 {
+			t.Errorf("expected empty result stream")
+		}
+	})
+
+	t.Run("Map", func(t *testing.T) {
+		t.Parallel()
+
+		ff := empty.StreamSelf().Map(func(x Finder) { x.Data = "foo" })
+
+		if len(ff.Collect()) != 0 {
+			t.Errorf("expected empty result stream")
+		}
+	})
+
+	t.Run("Reduce", func(t *testing.T) {
+		t.Parallel()
+
+		ff := empty.StreamSelf().Reduce(
+			func(prev, x Finder) (Finder, bool) { return x, true },
+		)
+
+		if len(ff.Collect()) != 0 {
+			t.Errorf("expected empty result stream")
+		}
+	})
+}
