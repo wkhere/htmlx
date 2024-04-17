@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,63 +11,21 @@ import (
 	"golang.org/x/net/html"
 )
 
-var (
-	compactSpaces = flag.Bool("compact-spaces", true,
-		"print SPC/LF etc if element data contains only spaces")
-	trimAttr = flag.Bool("trim-attr", true,
-		"don't print empty attributes")
-)
+type config struct {
+	compactSpaces bool
+	trimAttr      bool
 
-func perr(a ...interface{}) {
-	fmt.Fprintln(os.Stderr, a...)
+	args []string
+	help func(io.Writer)
 }
 
-func usage() {
-	perr("Usage:")
-	const pname = "parsehtml"
-	perr("\tparsehtml [flags] http(s)://url")
-	perr("\tparsehtml [flags] file://path")
-	perr("\tparsehtml [flags] path")
-	perr("\tparsehtml [flags] - <file")
-	perr("\tparsehtml [flags] one_input another_input")
-	perr("Flags:")
-	flag.PrintDefaults()
-}
-
-func die(err error) {
-	perr("parsehtml:", err)
-	os.Exit(1)
-}
-
-func dieIf(err error) {
-	if err != nil {
-		die(err)
-	}
-}
-
-func main() {
-	flag.Usage = usage
-	flag.Parse()
-	args := flag.Args()
-
-	if len(args) == 0 {
-		perr("nothing to parse; supply url, file or - as arguments")
-		os.Exit(2)
-	}
-
-	for _, arg := range args {
-		process(arg)
-	}
-}
-
-func process(url string) {
+func process(url string, p *pp.Printer) (err error) {
 
 	if !strings.Contains(url, "://") {
 		url = "file://" + url
 	}
 
 	var r io.ReadCloser
-	var err error
 
 	switch tokens := strings.Split(url, "://"); tokens[0] {
 	case "file":
@@ -77,23 +34,56 @@ func process(url string) {
 			break
 		}
 		r, err = os.Open(tokens[1])
-		dieIf(err)
+		if err != nil {
+			return err
+		}
 
 	case "http", "https":
 		resp, err := http.Get(url)
-		dieIf(err)
+		if err != nil {
+			return err
+		}
 		r = resp.Body
 
 	default:
-		die(fmt.Errorf("unknown proto: %s", tokens[0]))
+		return fmt.Errorf("unknown proto: %s", tokens[0])
 	}
 	defer r.Close()
 
 	root, err := html.Parse(r)
-	dieIf(err)
+	if err != nil {
+		return err
+	}
 
-	pp.Printer{
-		CompactSpaces: *compactSpaces,
-		TrimEmptyAttr: *trimAttr,
-	}.Print(os.Stdout, root)
+	p.Print(os.Stdout, root)
+
+	return nil
+}
+
+func main() {
+	conf, err := parseArgs(os.Args[1:])
+	if err != nil {
+		die(2, err)
+	}
+	if conf.help != nil {
+		conf.help(os.Stdout)
+		os.Exit(0)
+	}
+
+	p := pp.Printer{
+		CompactSpaces: conf.compactSpaces,
+		TrimEmptyAttr: conf.trimAttr,
+	}
+
+	for _, arg := range conf.args {
+		err = process(arg, &p)
+		if err != nil {
+			die(1, err)
+		}
+	}
+}
+
+func die(code int, err error) {
+	fmt.Fprintln(os.Stderr, "parsehtml:", err)
+	os.Exit(code)
 }
