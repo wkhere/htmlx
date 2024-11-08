@@ -1,8 +1,8 @@
 package htmlx
 
 import (
-	"bytes"
 	"io"
+	"strings"
 
 	"golang.org/x/net/html"
 
@@ -26,8 +26,7 @@ func FinderFromData(r io.Reader) (Finder, error) {
 }
 
 func FinderFromString(s string) (Finder, error) {
-	// todo: check if strings.Reader is faster -> bigger benchmarks
-	return FinderFromData(bytes.NewBufferString(s))
+	return FinderFromData(strings.NewReader(s))
 }
 
 func (f Finder) IsEmpty() bool {
@@ -42,8 +41,7 @@ func (f Finder) String() string {
 	if f.Node == nil {
 		return ""
 	}
-	// todo: check if strings.Builder is faster -> bigger benchmarks
-	var b bytes.Buffer
+	var b strings.Builder
 	f.Write(&b)
 	return b.String()
 }
