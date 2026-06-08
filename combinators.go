@@ -29,7 +29,7 @@ func (ff FinderStream) Join(split SplitFunc) FinderStream {
 
 // Map maps the stream, changing each node wrapped by the finder
 // according to the given function.
-// Note that this function as a signature: `func (Finder)` and is supposed
+// Note that this function has a signature: `func (Finder)` and is supposed
 // to change the internally copied html.Node struct whose pointer is wrapped
 // by the finder.
 // Also note that such an implicit copy is not made in the Reduce function,
