@@ -337,7 +337,7 @@ func (f Finder) FindPrevSiblings(pred pred.Predicate) FinderStream {
 // FindWithSiblings performs depth-first travelsal looking for the first
 // of nodes satisfying given predicate.
 // Then it continues flat find of all the siblings satisfying the predicate.
-// All results are pushed into the returted stream of Finders.
+// All results are pushed into the returned stream of Finders.
 func (f Finder) FindWithSiblings(pred pred.Predicate) FinderStream {
 	ch := make(chan Finder, 1)
 
