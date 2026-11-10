@@ -3,7 +3,7 @@ module github.com/wkhere/htmlx
 go 1.26.0
 
 require (
-	github.com/spf13/pflag v1.0.6
+	codeberg.org/wkhere/argp v0.16.4
 	golang.org/x/net v0.62.0
 )
 

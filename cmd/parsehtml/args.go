@@ -4,49 +4,78 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/spf13/pflag"
+	"codeberg.org/wkhere/argp"
+	pc "codeberg.org/wkhere/argp/parsecommon"
 )
 
+func defaults() config {
+	return config{
+		compactSpaces: true,
+		trimAttr:      true,
+	}
+}
+
+func usage(w io.Writer) {
+	d := defaults()
+
+	fmt.Fprintf(w,
+		`Usage:
+	parsehtml [flags] http(s)://url
+	parsehtml [flags] file://path
+	parsehtml [flags] path
+	parsehtml [flags] - <file
+	parsehtml [flags] one_input another_input
+Flags:
+	--compact-spaces   print SPC/LF etc if element data contains only spaces (default: %[1]v)
+	--trim-attr        don't print empty attributes (default: %[1]v)
+	-h, --help         show this help and exit
+`,
+		d.compactSpaces,
+		d.trimAttr,
+	)
+
+}
+
 func parseArgs(args []string) (c config, err error) {
-	var help bool
 
-	fs := pflag.NewFlagSet("parsehtml", pflag.ContinueOnError)
-	fs.SortFlags = false
+	c = defaults()
 
-	fs.BoolVar(&c.compactSpaces, "compact-spaces", true,
-		"print SPC/LF etc if element data contains only spaces")
+	var p = &argp.PState{Args: args}
+	var rest []string
 
-	fs.BoolVar(&c.trimAttr, "trim-attr", true,
-		"don't print empty attributes")
+loop:
+	for ; len(p.Args) > 0 && p.Err == nil; p.Next() {
+		switch {
 
-	fs.BoolVarP(&help, "help", "h", false, "show this help and exit")
+		case p.MatchBoolFlag("", "--compact-spaces"):
+			pc.ParseBool(&c.compactSpaces, p)
 
-	err = fs.Parse(args)
-	if err != nil {
-		return c, err
-	}
+		case p.MatchBoolFlag("", "--trim-attr"):
+			pc.ParseBool(&c.trimAttr, p)
 
-	if help {
-		c.help = func(w io.Writer) {
-			fs.SetOutput(w)
-			p := func(s string) { fmt.Fprintln(fs.Output(), s) }
-			p("Usage:")
-			p("\tparsehtml [flags] http(s)://url")
-			p("\tparsehtml [flags] file://path")
-			p("\tparsehtml [flags] path")
-			p("\tparsehtml [flags] - <file")
-			p("\tparsehtml [flags] one_input another_input")
-			p("Flags:")
-			fs.PrintDefaults()
+		case p.MatchJustFlag("-h", "--help"):
+			c.help = usage
+			return c, nil
+
+		case p.Arg() == "--":
+			rest = append(rest, p.Args[1:]...)
+			break loop
+
+		case p.MatchAnyFlag():
+			p.Errorf("unknown flag %s", p.Flag)
+
+		default:
+			rest = append(rest, p.Arg())
 		}
-		return c, nil
 	}
 
-	c.args = fs.Args()
-
-	if len(c.args) == 0 {
+	if p.Err != nil {
+		return c, p.Err
+	}
+	if len(rest) == 0 {
 		return c, fmt.Errorf("nothing to parse; supply url, file or - as arguments")
 	}
 
+	c.args = rest
 	return c, nil
 }

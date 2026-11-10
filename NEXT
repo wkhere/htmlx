@@ -9,5 +9,5 @@ parsehtml binary:
 	+ parse also local files
 	+ show whitespace-only data in a compact way
 	+ trim empty attributes
-	- simpler args parsing via argp
+	+ simpler args parsing via argp
 	- coverage
