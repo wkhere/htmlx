@@ -8,7 +8,7 @@ HTML parsing eXtensions, aka monadic Finder of elements.
 
 The idea is to wrap parsed `html.Node` with `Finder` and chain the calls for finding HTML elements within subtrees.
 
-Includes handy `parsehtml` command to visualize given HTML file or the URL content.
+Includes handy `parsehtml` command to visualize parsed HTML file or the URL content.
 
 ### Example
 
