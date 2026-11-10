@@ -14,18 +14,36 @@ Includes handy `parsehtml` command to visualize given HTML file or the URL conte
 
 ```Go
 import (
+	"fmt"
+	"net/http"
+	"strings"
+
 	"github.com/wkhere/htmlx"
 	"github.com/wkhere/htmlx/pred"
 	"golang.org/x/net/html/atom"
 )
 
-// ...
-top, err := htmlx.FinderFromData(resp.Body)
-// err handling...
+[...]
 
-myElement := top.
-	Find(pred.Element(atom.Body)).
-	Find(pred.Element(atom.Div, pred.ID("content"))).
-	Find(pred.Element(atom.Table, pred.Class("foo"))).
-	Find(pred.Element(atom.Tr)).FindSiblings(pred.Element(atom.Tr))
+	resp, err := http.Get("https://go.dev/doc/devel/release")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	top, err := htmlx.FinderFromData(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	elements := top.
+		Find(pred.Element(atom.Main)).
+		Find(pred.ID("go1.27.minor")).
+		FindSiblings(pred.Element(atom.P, pred.IDCond(func(id string) bool {
+			return strings.HasPrefix(id, "go1.27.")
+		})))
+
+	for _, f := range elements.Collect() {
+		fmt.Println(f.String())
+	}
 ```
