@@ -4,11 +4,13 @@
 [![Coverage Status](https://coveralls.io/repos/github/wkhere/htmlx/badge.svg?branch=master)](https://coveralls.io/github/wkhere/htmlx?branch=master)
 [![Go Reference](https://pkg.go.dev/badge/github.com/wkhere/htmlx.svg)](https://pkg.go.dev/github.com/wkhere/htmlx)
 
-HTML parsing eXtensions, aka monadic Finder of elements.
+HTML parsing eXtensions.
 
-The idea is to wrap parsed `html.Node` with `Finder` and chain the calls for finding HTML elements within subtrees.
+`Finder` wraps a parsed `html.Node` and locates elements through chained `Find*` calls, each taking a predicate built with the `pred` package.
 
-Includes handy `parsehtml` command to visualize parsed HTML file or the URL content.
+The chaining works much like Haskell's `Maybe` monad. Each `Find*` call searches relative to the current element (its subtree or its siblings) and wraps the match in a new `Finder`, so the next call in the chain continues from there. When nothing matches, the call returns an empty `Finder`, which plays the role of `Nothing`: it is still a valid receiver, and any further calls on it simply return empty results. This way a whole chain can be written without checking for a miss after each step; the result is checked once, at the end. Methods yielding multiple elements, like `FindAll` or `FindSiblings`, return a `FinderStream`, which acts like the list monad, with `Join` serving as its bind.
+
+The project also includes a handy `parsehtml` command to visualize a parsed HTML file or URL content.
 
 ### Example
 
