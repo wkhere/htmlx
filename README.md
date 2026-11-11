@@ -6,11 +6,33 @@
 
 HTML parsing eXtensions.
 
-`Finder` wraps a parsed `html.Node` and locates elements through chained `Find*` calls, each taking a predicate built with the `pred` package.
+[`Finder`](https://pkg.go.dev/github.com/wkhere/htmlx#Finder) wraps a parsed `html.Node`
+and locates elements through chained `Find*` calls, each taking a predicate built
+with the [`pred`](https://pkg.go.dev/github.com/wkhere/htmlx/pred) package (see below).
 
-The chaining works much like Haskell's `Maybe` monad. Each `Find*` call searches relative to the current element (its subtree or its siblings) and wraps the match in a new `Finder`, so the next call in the chain continues from there. When nothing matches, the call returns an empty `Finder`, which plays the role of `Nothing`: it is still a valid receiver, and any further calls on it simply return empty results. This way a whole chain can be written without checking for a miss after each step; the result is checked once, at the end. Methods yielding multiple elements, like `FindAll` or `FindSiblings`, return a `FinderStream`, which acts like the list monad, with `Join` serving as its bind.
+The chaining works much like Haskell's `Maybe` monad. Each `Find*` call searches relative to
+the current element (its subtree or its siblings) and wraps the match in a new `Finder`,
+so the next call in the chain continues from there. When nothing matches, the call returns
+an empty `Finder`, which plays the role of `Nothing`: it is still a valid receiver,
+and any further calls on it simply return empty results. This way a whole chain can be written
+without checking for a miss after each step; the result is checked once, at the end.
+Methods yielding multiple elements, like `FindAll` or `FindSiblings`, return a `FinderStream`,
+which acts like the list monad, with `Join` serving as its bind.
 
-The project also includes a handy `parsehtml` command to visualize a parsed HTML file or URL content.
+Predicates are plain `func(*html.Node) bool` functions.
+The [`pred`](https://pkg.go.dev/github.com/wkhere/htmlx/pred) package provides ready-made ones
+for matching elements by tag, id, class, attribute value or inner text,
+most with a `*Cond` variant taking an arbitrary string test, e.g. 
+`pred.ClassCond(func(c string) bool { return strings.HasPrefix(c, "nav-") })`.
+The `pred.Element` function accepts further predicates that must all hold,
+so `pred.Element(atom.Div, pred.Class("note"))` matches only `div`s of the class `note`.
+For anything not covered by the ready-made predicates, a custom predicate is easy to write with
+the [`attr`](https://pkg.go.dev/github.com/wkhere/htmlx/attr) package, which wraps a node's
+attributes in `attr.List` and offers lookups such as `Val`, `HasWord` or `HasClass`;
+the same list is returned by `Finder.Attr`.
+
+The project also includes a handy `parsehtml` command to visualize a parsed HTML file
+or URL content.
 
 ### Example
 
