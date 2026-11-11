@@ -14,36 +14,37 @@ Includes handy `parsehtml` command to visualize parsed HTML file or the URL cont
 
 ```Go
 import (
-	"fmt"
-	"net/http"
-	"strings"
+        "fmt"
+        "net/http"
+        "strings"
 
-	"github.com/wkhere/htmlx"
-	"github.com/wkhere/htmlx/pred"
-	"golang.org/x/net/html/atom"
+        "github.com/wkhere/htmlx"
+        "github.com/wkhere/htmlx/pred"
+        "golang.org/x/net/html/atom"
 )
 
-[...]
+func example() error {
+        resp, err := http.Get("https://go.dev/doc/devel/release")
+        if err != nil {
+                return err
+        }
+        defer resp.Body.Close()
 
-	resp, err := http.Get("https://go.dev/doc/devel/release")
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
+        top, err := htmlx.FinderFromData(resp.Body)
+        if err != nil {
+                return err
+        }
 
-	top, err := htmlx.FinderFromData(resp.Body)
-	if err != nil {
-		return err
-	}
+        elements := top.
+                Find(pred.Element(atom.Main)).
+                Find(pred.ID("go1.27.minor")).
+                FindSiblings(pred.Element(atom.P, pred.IDCond(func(id string) bool {
+                        return strings.HasPrefix(id, "go1.27.")
+                })))
 
-	elements := top.
-		Find(pred.Element(atom.Main)).
-		Find(pred.ID("go1.27.minor")).
-		FindSiblings(pred.Element(atom.P, pred.IDCond(func(id string) bool {
-			return strings.HasPrefix(id, "go1.27.")
-		})))
-
-	for _, f := range elements.Collect() {
-		fmt.Println(f.String())
-	}
+        for _, f := range elements.Collect() {
+                fmt.Println(f.String())
+        }
+        return nil
+}
 ```
